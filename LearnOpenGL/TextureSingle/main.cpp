@@ -189,7 +189,7 @@ void InitTexture()
 	GLuint sampler;
 	glCreateSamplers(1, &sampler);
 	//将采样器对象绑定到纹理单元中
-	glBindSampler(5, sampler);
+	glBindSampler(0, sampler);
 	//设置超出超出图片范围纹理采样方式
 	glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glSamplerParameteri(sampler, GL_TEXTURE_WRAP_T, GL_REPEAT);
