@@ -94,7 +94,7 @@ GLuint InitShader()
 //缓存对象初始化
 void InitVBO(GLuint &VBO)
 {
-	//顶点数据
+	//顶点位置
 	const float position[4][2] =
 	{
 		{ -0.8f, -0.8f },{ -0.8f, 0.8f },{ 0.8f, -0.8f },{ 0.8f, 0.8f }
