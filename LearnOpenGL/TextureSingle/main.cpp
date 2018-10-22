@@ -55,6 +55,8 @@ int main()
 	//初始化顶点数组对象
 	GLuint VAO;
 	InitVAO(VAO, VBO);
+	//设置纹理单元位置值
+	SetUniform(program);
 	
 	//初始化纹理对象
 	InitTexture();
@@ -86,10 +88,6 @@ GLuint InitShader()
 	//启动着色器程序
 	shader.RunProgram();
 
-	//给纹理单元设置位置值
-	int texUnit = glGetUniformLocation(shader.program, "tex");
-	glUniform1i(texUnit, 0);
-
 	return shader.program;
 }
 
@@ -99,14 +97,8 @@ void InitVBO(GLuint &VBO)
 	//顶点数据
 	const float position[4][2] =
 	{
-		//{ -0.5f, -0.5f },{ -0.5f, 0.5f },{ 0.5f, -0.5f },{ 0.5f, 0.5f }
 		{ -0.8f, -0.8f },{ -0.8f, 0.8f },{ 0.8f, -0.8f },{ 0.8f, 0.8f }
 	};
-	//颜色数据
-	/*const float color[4][3] =
-	{
-		{ 1, 0, 0 },{ 0, 1, 0 },{ 0, 0, 1 },{ 1, 1, 0 }
-	};*/
 	//纹理坐标
 	const float texCoord[4][2] = 
 	{
@@ -115,7 +107,7 @@ void InitVBO(GLuint &VBO)
 	//创建缓存对象
 	glCreateBuffers(1, &VBO);
 	//为缓存对象分配空间
-	glNamedBufferStorage(VBO, sizeof(position) + sizeof(texCoord), nullptr, GL_DYNAMIC_STORAGE_BIT);;
+	glNamedBufferStorage(VBO, sizeof(position) + sizeof(texCoord), nullptr, GL_DYNAMIC_STORAGE_BIT);
 	//初始化缓存对象
 	glNamedBufferSubData(VBO, 0, sizeof(position), position);
 	glNamedBufferSubData(VBO, sizeof(position), sizeof(texCoord), texCoord);
@@ -137,13 +129,13 @@ void InitVAO(GLuint &VAO, GLuint &VBO)
 	//启用顶点位置属性
 	glEnableVertexArrayAttrib(VAO, 0);
 
-	//将VBO颜色数据绑定到VAO第一个绑定点上
+	//将VBO纹理坐标绑定到VAO第一个绑定点上
 	glVertexArrayVertexBuffer(VAO, 1, VBO, 8 * sizeof(float), 2 * sizeof(float));
-	//设置顶点颜色属性数据解析格式
+	//设置纹理坐标属性数据解析格式
 	glVertexArrayAttribFormat(VAO, 1, 2, GL_FLOAT, GL_FALSE, 0);
-	//将颜色数据和顶点颜色索引相关联
+	//将纹理坐标和纹理坐标索引相关联
 	glVertexArrayAttribBinding(VAO, 1, 1);
-	//启用顶点颜色属性
+	//启用纹理坐标属性
 	glEnableVertexArrayAttrib(VAO, 1);
 
 	//绑定VAO
@@ -212,11 +204,9 @@ void InitTexture()
 //设置uniform值
 void SetUniform(GLuint &program)
 {
-	//uniform数值在着色器程序的索引
-	int location;
-	//获取索引
-	location = glGetUniformLocation(program, "offset");
-	glUniform1f(location, 0.3f);
+	//给纹理单元设置位置值
+	int texUnit = glGetUniformLocation(program, "tex");
+	glUniform1i(texUnit, 0);
 }
 
 //顺序绘制
