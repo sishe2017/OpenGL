@@ -1,0 +1,408 @@
+#include "Library/Shader.h"
+#include <iostream>
+#include <sstream>
+#include "Library/ReadBack.h"
+#include "Library/stb_image.h"
+#include "Library/glm/glm.hpp"
+#include "Library/glm/gtc/matrix_transform.hpp"
+#include "Library/glm/gtc/type_ptr.hpp"
+#include <iostream>
+
+using namespace std;
+
+//着色器初始化
+GLuint InitShader();
+//缓存对象初始化
+void InitVBO(GLuint &VBO);
+//顶点数组对象初始化
+void InitVAO(GLuint &VAO, GLuint &VBO);
+//索引数组初始化
+void InitEBO(GLuint &EBO);
+//设置uniform变量
+void SetUniform(GLuint &program);
+//纹理对象初始化
+void InitTexture();
+//初始化坐标变换矩阵
+void InitCoordMatrix(GLuint program, float WHP);
+//顺序绘制绘制
+void DrawArray();
+//索引绘制
+void DrawElements();
+//处理键盘输入
+void ProcessInput(GLFWwindow *window, GLuint program);
+
+int main()
+{
+	//初始化工作
+	glfwInit();
+	//设置OpenGL版本为4.5
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+	//设置为核心模式
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+	//创建窗口
+	GLFWwindow *window = glfwCreateWindow(512, 512, "TestWindow", NULL, NULL);
+	//告诉GLFW窗口的上下文
+	glfwMakeContextCurrent(window);
+
+	//初始化GLAD
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	{
+		std::cout << "Failed to initialize GLAD" << std::endl;
+		return -1;
+	}
+
+	//调整视口
+	glViewport(0, 0, 512, 512);
+
+	//初始化着色器
+	GLuint program = InitShader();
+	//初始化缓存对象
+	GLuint VBO;
+	InitVBO(VBO);
+	//初始化顶点数组对象
+	GLuint VAO;
+	InitVAO(VAO, VBO);
+	//设置纹理单元位置值
+	SetUniform(program);
+	//初始化纹理对象
+	InitTexture();
+	//设置变换矩阵
+	//InitCoordMatrix(program, 512 / 512);
+
+	int location;
+
+	////启用深度测试
+	glEnable(GL_DEPTH_TEST);
+	////设置深度测试比较函数
+	//glDepthFunc(GL_LESS);
+	////设置深度缓存掩码
+	//glDepthMask(GL_TRUE);
+
+	//背景颜色为白色
+	float background[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	//初试深度值
+	GLfloat initDepth = 1;
+
+	//事件循环
+	while (!glfwWindowShouldClose(window))
+	{
+		//处理键盘输入
+		ProcessInput(window, program);
+		////清除颜色缓存
+		//glClearBufferfv(GL_COLOR, 0, background);
+		////清除深度缓存
+		//glClearBufferfv(GL_DEPTH, 0, &initDepth);
+		glClearColor(1, 1, 1, 1);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		//设置变换矩阵
+		InitCoordMatrix(program, 512 / 512);
+
+		DrawArray();
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
+
+	glfwDestroyWindow(window);
+	glfwTerminate();
+
+	return 0;
+}
+
+//着色器初始化
+GLuint InitShader()
+{
+	Shader shader;
+	//编译顶点着色器
+	shader.CompileVertex("E:/OpenGLProject/3DBox/3DBox/3DBox.vert");
+	//编译片元着色器
+	shader.CompileFrag("E:/OpenGLProject/3DBox/3DBox/3DBox.frag");
+	//链接着色器程序
+	shader.LinkProgram();
+	//启动着色器程序
+	shader.RunProgram();
+
+	return shader.program;
+}
+
+//缓存对象初始化
+void InitVBO(GLuint &VBO)
+{
+	//顶点位置
+	//const float position[8][3] =
+	//{
+	//	{ -0.5f, -0.5f, -0.5f },//0
+	//	{  0.5f, -0.5f, -0.5f },//1
+	//	{ -0.5f,  0.5f, -0.5f },//2
+	//	{ -0.5f, -0.5f,  0.5f },//3
+	//	{ -0.5f,  0.5f,  0.5f },//4
+	//	{  0.5f, -0.5f,  0.5f },//5
+	//	{  0.5f,  0.5f, -0.5f },//6
+	//	{  0.5f,  0.5f,  0.5f } //7
+	//};
+	const float position[36][3] =
+	{
+		//x =  0.5
+		{  0.5f, -0.5f, -0.5f },{  0.5f,  0.5f, -0.5f },{  0.5f,  0.5f,  0.5f },
+		{  0.5f, -0.5f, -0.5f },{  0.5f, -0.5f,  0.5f },{  0.5f,  0.5f,  0.5f },
+		//x = -0.5
+		{ -0.5f, -0.5f, -0.5f },{ -0.5f,  0.5f, -0.5f },{ -0.5f,  0.5f,  0.5f },
+		{ -0.5f, -0.5f, -0.5f },{ -0.5f, -0.5f,  0.5f },{ -0.5f,  0.5f,  0.5f },
+		//y =  0.5
+		{ -0.5f,  0.5f, -0.5f },{  0.5f,  0.5f, -0.5f },{  0.5f,  0.5f,  0.5f },
+		{ -0.5f,  0.5f, -0.5f },{ -0.5f,  0.5f,  0.5f },{  0.5f,  0.5f,  0.5f },
+		//y = -0.5
+		{ -0.5f, -0.5f, -0.5f },{  0.5f, -0.5f, -0.5f },{  0.5f, -0.5f,  0.5f },
+		{ -0.5f, -0.5f, -0.5f },{ -0.5f, -0.5f,  0.5f },{  0.5f, -0.5f,  0.5f },
+		//z =  0.5
+		{ -0.5f, -0.5f,  0.5f },{  0.5f, -0.5f,  0.5f },{  0.5f,  0.5f,  0.5f },
+		{ -0.5f, -0.5f,  0.5f },{ -0.5f,  0.5f,  0.5f },{  0.5f,  0.5f,  0.5f },
+		//z = -0.5
+		{ -0.5f, -0.5f, -0.5f },{  0.5f, -0.5f, -0.5f },{  0.5f,  0.5f, -0.5f },
+		{ -0.5f, -0.5f, -0.5f },{ -0.5f,  0.5f, -0.5f },{  0.5f,  0.5f, -0.5f },
+	};
+	//木箱纹理坐标
+	const float woodenBoxTex[36][2] =
+	{
+		//x =  0.5
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },
+		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+		//x = -0.5
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },
+		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+		//y =  0.5
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },
+		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+		//y = -0.5
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },
+		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+		//z =  0.5
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },
+		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+		//z = -0.5
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },
+		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+	};
+	//笑脸纹理坐标
+	const float smileFaceTex[36][2] =
+	{
+		//x =  0.5
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },
+		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+		//x = -0.5
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },
+		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+		//y =  0.5
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },
+		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+		//y = -0.5
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },
+		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+		//z =  0.5
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },
+		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+		//z = -0.5
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },
+		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+	};
+	//创建缓存对象
+	glCreateBuffers(1, &VBO);
+	//为缓存对象分配空间
+	glNamedBufferStorage(VBO, sizeof(position) + sizeof(woodenBoxTex) + sizeof(smileFaceTex), nullptr, GL_DYNAMIC_STORAGE_BIT);
+	//初始化缓存对象
+	glNamedBufferSubData(VBO, 0, sizeof(position), position);
+	glNamedBufferSubData(VBO, sizeof(position), sizeof(woodenBoxTex), woodenBoxTex);
+	glNamedBufferSubData(VBO, sizeof(position) + sizeof(woodenBoxTex), sizeof(smileFaceTex), smileFaceTex);
+
+	//ReadBackBuffer(VBO, sizeof(position) + sizeof(texCoord));
+}
+
+//顶点数组对象初始化
+void InitVAO(GLuint &VAO, GLuint &VBO)
+{
+	//创建顶点数组对象
+	glCreateVertexArrays(1, &VAO);
+	//将VBO位置数据绑定到VAO的第0个绑定点上
+	glVertexArrayVertexBuffer(VAO, 0, VBO, 0, 3 * sizeof(float));
+	//设置顶点位置属性数据解析格式
+	glVertexArrayAttribFormat(VAO, 0, 3, GL_FLOAT, GL_FALSE, 0);
+	//将位置数据和顶点位置索引相关联
+	glVertexArrayAttribBinding(VAO, 0, 0);
+	//启用顶点位置属性
+	glEnableVertexArrayAttrib(VAO, 0);
+
+	//将VBO木箱纹理坐标绑定到VAO第一个绑定点上
+	glVertexArrayVertexBuffer(VAO, 1, VBO, 108 * sizeof(float), 2 * sizeof(float));
+	//设置木箱纹理坐标数据解析格式
+	glVertexArrayAttribFormat(VAO, 1, 2, GL_FLOAT, GL_FALSE, 0);
+	//将木箱纹理坐标和木箱纹理坐标索引相关联
+	glVertexArrayAttribBinding(VAO, 1, 1);
+	//启用木箱纹理坐标属性
+	glEnableVertexArrayAttrib(VAO, 1);
+
+	//将VBO笑脸纹理坐标绑定到VAO第二个绑定点上
+	glVertexArrayVertexBuffer(VAO, 2, VBO, 180 * sizeof(float), 2 * sizeof(float));
+	//设置笑脸纹理坐标属性数据解析格式
+	glVertexArrayAttribFormat(VAO, 2, 2, GL_FLOAT, GL_FALSE, 0);
+	//将笑脸纹理坐标和笑脸纹理坐标索引相关联
+	glVertexArrayAttribBinding(VAO, 2, 2);
+	//启用笑脸纹理坐标属性
+	glEnableVertexArrayAttrib(VAO, 2);
+
+	//绑定VAO
+	glBindVertexArray(VAO);
+
+	//ReadBackVertexAttrib(1);
+}
+
+//索引数组初始化
+void InitEBO(GLuint &EBO)
+{
+	//索引
+	static const unsigned int indices[12][3] =
+	{
+		{ 3, 5, 7 },{ 3, 4, 7 },
+		{ 0, 1, 6 },{ 0, 2, 6 },
+		{ 1, 6, 7 },{ 1, 5, 7 },
+		{ 0, 2, 4 },{ 0, 3, 4 },
+		{ 2, 6, 7 },{ 2, 4, 7 },
+		{ 0, 1, 5 },{ 0, 3, 5 },
+	};
+	//创建缓存对象
+	glCreateBuffers(1, &EBO);
+	//为缓存对象分配空间并初始化
+	glNamedBufferStorage(EBO, sizeof(indices), indices, 0);
+	//将缓存对象绑定到索引数组中
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+}
+
+//纹理对象初始化
+void InitTexture()
+{
+	//纹理数据
+	unsigned char *textureData;
+	//图像宽度
+	int width;
+	//图像高度
+	int height;
+	//颜色通道数量
+	int nrChannel;
+	//翻转y轴
+	stbi_set_flip_vertically_on_load(true);
+	//获取木箱纹理信息相关数据
+	textureData = stbi_load("C:/Users/hasee/Desktop/container.jpg", &width, &height, &nrChannel, 0);
+
+	//创建两个纹理对象：木箱纹理和笑脸纹理
+	GLuint texture[2];
+	glCreateTextures(GL_TEXTURE_2D, 2, texture);
+
+	//将木箱纹理对象绑定到纹理单元0上
+	glBindTextureUnit(0, texture[0]);
+	//为木箱纹理对象分配空间
+	glTextureStorage2D(texture[0], 1, GL_RGB8, width, height);
+	//更新木箱纹理对象数据
+	glTextureSubImage2D(texture[0], 0, 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, textureData);
+
+	//释放纹理数据
+	stbi_image_free(textureData);
+
+	//翻转y轴
+	stbi_set_flip_vertically_on_load(true);
+	//获取笑脸纹理数据
+	textureData = stbi_load("C:/Users/hasee/Desktop/awesomeface.png", &width, &height, &nrChannel, 0);
+
+	//将笑脸纹理对象绑定到纹理单元1上
+	glBindTextureUnit(1, texture[1]);
+	//为笑脸纹理对象分配空间
+	glTextureStorage2D(texture[1], 1, GL_RGBA8, width, height);
+	//更新纹理对象数据
+	glTextureSubImage2D(texture[1], 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+
+	//创建两个采样器对象：木箱采样器和笑脸采样器
+	GLuint sampler[2];
+	glCreateSamplers(2, sampler);
+	//将木箱采样器对象绑定到纹理单元0中
+	glBindSamplers(0, 2, sampler);
+	////设置木箱纹理环绕方式
+	glSamplerParameteri(sampler[0], GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glSamplerParameteri(sampler[0], GL_TEXTURE_WRAP_T, GL_REPEAT);
+	//设置木箱纹理过滤方式
+	glSamplerParameteri(sampler[0], GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glSamplerParameteri(sampler[0], GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	//设置笑脸纹理环绕方式
+	glSamplerParameteri(sampler[1], GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glSamplerParameteri(sampler[1], GL_TEXTURE_WRAP_T, GL_REPEAT);
+	//设置笑脸纹理过滤方式
+	glSamplerParameteri(sampler[1], GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glSamplerParameteri(sampler[1], GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	//释放纹理数据
+	stbi_image_free(textureData);
+}
+
+//设置uniform值
+void SetUniform(GLuint &program)
+{
+	int location;
+	//给木箱纹理单元设置位置值
+	location = glGetUniformLocation(program, "woodenBoxSampler");
+	glUniform1i(location, 0);
+	//给笑脸纹理单元设置位置值
+	location = glGetUniformLocation(program, "smileFaceSampler");
+	glUniform1i(location, 1);
+}
+
+//初始化坐标变换矩阵
+void InitCoordMatrix(GLuint program, float WHP)
+{
+	int location;
+	//获取模型矩阵位置
+	location = glGetUniformLocation(program, "model");
+	//生成模型矩阵
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::rotate(model,  (float)glfwGetTime() * glm::radians(-55.0f), glm::vec3(1, 0, 0));
+	//传值给顶点着色器
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(model));
+
+	//获取观察矩阵位置
+	location = glGetUniformLocation(program, "view");
+	//生成观察矩阵
+	glm::mat4 view = glm::mat4(1.0f);
+	view = glm::translate(view, glm::vec3(0, 0, -3.0f));
+	//传值给顶点着色器
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(view));
+
+	//获取投影矩阵位置
+	location = glGetUniformLocation(program, "projection");
+	//生成投影矩阵
+	glm::mat4 projection = glm::mat4(1.0f);
+	projection = glm::perspective(45.0f, WHP, 0.f, 100.0f);
+	//传值给顶点着色器
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(projection));
+}
+
+//顺序绘制
+void DrawArray()
+{
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+
+//索引绘制
+void DrawElements()
+{
+	//索引绘制
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
+}
+
+//处理键盘输入
+void ProcessInput(GLFWwindow *window, GLuint program)
+{
+	//ESC键退出程序
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
+}
