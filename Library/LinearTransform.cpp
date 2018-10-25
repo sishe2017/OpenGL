@@ -1,7 +1,7 @@
 #include "LinearTransform.h"
-#include "Library/glm/glm.hpp"
-#include "Library/glm/gtc/matrix_transform.hpp"
-#include "Library/glm/gtc/type_ptr.hpp"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 //ÕûÌåËõ·Å
 void Scale(GLuint program, float scale)
