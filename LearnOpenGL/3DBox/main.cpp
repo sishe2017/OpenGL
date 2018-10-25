@@ -24,10 +24,6 @@ void SetUniform(GLuint &program);
 void InitTexture();
 //初始化坐标变换矩阵
 void InitCoordMatrix(GLuint program, float WHP);
-//顺序绘制绘制
-void DrawArray();
-//索引绘制
-void DrawElements();
 //处理键盘输入
 void ProcessInput(GLFWwindow *window, GLuint program);
 
@@ -64,43 +60,70 @@ int main()
 	//初始化顶点数组对象
 	GLuint VAO;
 	InitVAO(VAO, VBO);
+	//初始化索引缓冲
+	GLuint EBO;
+	InitEBO(EBO);
 	//设置纹理单元位置值
 	SetUniform(program);
 	//初始化纹理对象
 	InitTexture();
 	//设置变换矩阵
-	//InitCoordMatrix(program, 512 / 512);
+	InitCoordMatrix(program, 512 / 512);
 
+	//获取模型矩阵位置
 	int location;
+	location = glGetUniformLocation(program, "model");
+	//模型矩阵
+	glm::mat4 model;
 
-	////启用深度测试
+	//启用深度测试
 	glEnable(GL_DEPTH_TEST);
-	////设置深度测试比较函数
-	//glDepthFunc(GL_LESS);
-	////设置深度缓存掩码
-	//glDepthMask(GL_TRUE);
 
 	//背景颜色为白色
 	float background[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	//初试深度值
 	GLfloat initDepth = 1;
 
+	//10个箱子的坐标值
+	glm::vec3 boxCoord[10] =
+	{
+		glm::vec3( 0.0f,  0.0f,   0.0f),
+		glm::vec3( 2.0f,  5.0f, -15.0f),
+		glm::vec3(-1.5f, -2.2f,  -2.5f),
+		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3( 2.4f, -0.4f,  -3.5f),
+		glm::vec3(-1.7f,  3.0f,  -7.5f),
+		glm::vec3( 1.3f, -2.0f,  -2.5f),
+		glm::vec3( 1.5f,  2.0f,  -2.5f),
+		glm::vec3( 1.5f,  0.2f,  -1.5f),
+		glm::vec3(-1.3f,  1.0f,  -1.5f)
+	};
+
 	//事件循环
 	while (!glfwWindowShouldClose(window))
 	{
 		//处理键盘输入
 		ProcessInput(window, program);
-		////清除颜色缓存
-		//glClearBufferfv(GL_COLOR, 0, background);
-		////清除深度缓存
-		//glClearBufferfv(GL_DEPTH, 0, &initDepth);
-		glClearColor(1, 1, 1, 1);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//清除颜色缓存
+		glClearBufferfv(GL_COLOR, 0, background);
+		//清除深度缓存
+		glClearBufferfv(GL_DEPTH, 0, &initDepth);
 
-		//设置变换矩阵
-		InitCoordMatrix(program, 512 / 512);
+		//画十个箱子
+		for (int i = 0; i < 10; i++)
+		{
+			//初始化模型矩阵
+			model = glm::mat4(1.0f);
+			//设置每个箱子在世界坐标中的位置
+			model = glm::translate(model, boxCoord[i]);
+			//旋转箱子
+			model = glm::rotate(model, (float)glfwGetTime() * glm::radians(-55.0f), glm::vec3(1, 1, 0));
+			//传值给顶点着色器
+			glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(model));
+			//画出箱子
+			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, NULL);
+		}
 
-		DrawArray();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -130,83 +153,53 @@ GLuint InitShader()
 //缓存对象初始化
 void InitVBO(GLuint &VBO)
 {
-	//顶点位置
-	//const float position[8][3] =
-	//{
-	//	{ -0.5f, -0.5f, -0.5f },//0
-	//	{  0.5f, -0.5f, -0.5f },//1
-	//	{ -0.5f,  0.5f, -0.5f },//2
-	//	{ -0.5f, -0.5f,  0.5f },//3
-	//	{ -0.5f,  0.5f,  0.5f },//4
-	//	{  0.5f, -0.5f,  0.5f },//5
-	//	{  0.5f,  0.5f, -0.5f },//6
-	//	{  0.5f,  0.5f,  0.5f } //7
-	//};
-	const float position[36][3] =
+	const float position[24][3] =
 	{
 		//x =  0.5
-		{  0.5f, -0.5f, -0.5f },{  0.5f,  0.5f, -0.5f },{  0.5f,  0.5f,  0.5f },
-		{  0.5f, -0.5f, -0.5f },{  0.5f, -0.5f,  0.5f },{  0.5f,  0.5f,  0.5f },
+		{  0.5f, -0.5f, -0.5f },{  0.5f,  0.5f, -0.5f },{  0.5f,  0.5f,  0.5f },{  0.5f, -0.5f,  0.5f },
 		//x = -0.5
-		{ -0.5f, -0.5f, -0.5f },{ -0.5f,  0.5f, -0.5f },{ -0.5f,  0.5f,  0.5f },
-		{ -0.5f, -0.5f, -0.5f },{ -0.5f, -0.5f,  0.5f },{ -0.5f,  0.5f,  0.5f },
+		{ -0.5f, -0.5f, -0.5f },{ -0.5f,  0.5f, -0.5f },{ -0.5f,  0.5f,  0.5f },{ -0.5f, -0.5f,  0.5f },
 		//y =  0.5
-		{ -0.5f,  0.5f, -0.5f },{  0.5f,  0.5f, -0.5f },{  0.5f,  0.5f,  0.5f },
-		{ -0.5f,  0.5f, -0.5f },{ -0.5f,  0.5f,  0.5f },{  0.5f,  0.5f,  0.5f },
+		{ -0.5f,  0.5f, -0.5f },{  0.5f,  0.5f, -0.5f },{  0.5f,  0.5f,  0.5f },{ -0.5f,  0.5f,  0.5f },
 		//y = -0.5
-		{ -0.5f, -0.5f, -0.5f },{  0.5f, -0.5f, -0.5f },{  0.5f, -0.5f,  0.5f },
-		{ -0.5f, -0.5f, -0.5f },{ -0.5f, -0.5f,  0.5f },{  0.5f, -0.5f,  0.5f },
+		{ -0.5f, -0.5f, -0.5f },{  0.5f, -0.5f, -0.5f },{  0.5f, -0.5f,  0.5f },{ -0.5f, -0.5f,  0.5f },
 		//z =  0.5
-		{ -0.5f, -0.5f,  0.5f },{  0.5f, -0.5f,  0.5f },{  0.5f,  0.5f,  0.5f },
-		{ -0.5f, -0.5f,  0.5f },{ -0.5f,  0.5f,  0.5f },{  0.5f,  0.5f,  0.5f },
+		{ -0.5f, -0.5f,  0.5f },{  0.5f, -0.5f,  0.5f },{  0.5f,  0.5f,  0.5f },{ -0.5f,  0.5f,  0.5f },
 		//z = -0.5
-		{ -0.5f, -0.5f, -0.5f },{  0.5f, -0.5f, -0.5f },{  0.5f,  0.5f, -0.5f },
-		{ -0.5f, -0.5f, -0.5f },{ -0.5f,  0.5f, -0.5f },{  0.5f,  0.5f, -0.5f },
+		{ -0.5f, -0.5f, -0.5f },{  0.5f, -0.5f, -0.5f },{  0.5f,  0.5f, -0.5f },{ -0.5f,  0.5f, -0.5f },
 	};
 	//木箱纹理坐标
-	const float woodenBoxTex[36][2] =
+	const float woodenBoxTex[24][2] =
 	{
 		//x =  0.5
-		{ 0, 0 },{ 1, 0 },{ 1, 1 },
-		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },{ 0, 1 },
 		//x = -0.5
-		{ 0, 0 },{ 1, 0 },{ 1, 1 },
-		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },{ 0, 1 },
 		//y =  0.5
-		{ 0, 0 },{ 1, 0 },{ 1, 1 },
-		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },{ 0, 1 },
 		//y = -0.5
-		{ 0, 0 },{ 1, 0 },{ 1, 1 },
-		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },{ 0, 1 },
 		//z =  0.5
-		{ 0, 0 },{ 1, 0 },{ 1, 1 },
-		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },{ 0, 1 },
 		//z = -0.5
-		{ 0, 0 },{ 1, 0 },{ 1, 1 },
-		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },{ 0, 1 },
 	};
-	//笑脸纹理坐标
-	const float smileFaceTex[36][2] =
+	const float smileFaceTex[24][2] =
 	{
 		//x =  0.5
-		{ 0, 0 },{ 1, 0 },{ 1, 1 },
-		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },{ 0, 1 },
 		//x = -0.5
-		{ 0, 0 },{ 1, 0 },{ 1, 1 },
-		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },{ 0, 1 },
 		//y =  0.5
-		{ 0, 0 },{ 1, 0 },{ 1, 1 },
-		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },{ 0, 1 },
 		//y = -0.5
-		{ 0, 0 },{ 1, 0 },{ 1, 1 },
-		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },{ 0, 1 },
 		//z =  0.5
-		{ 0, 0 },{ 1, 0 },{ 1, 1 },
-		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },{ 0, 1 },
 		//z = -0.5
-		{ 0, 0 },{ 1, 0 },{ 1, 1 },
-		{ 0, 0 },{ 0, 1 },{ 1, 1 },
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },{ 0, 1 },
 	};
+
 	//创建缓存对象
 	glCreateBuffers(1, &VBO);
 	//为缓存对象分配空间
@@ -215,8 +208,6 @@ void InitVBO(GLuint &VBO)
 	glNamedBufferSubData(VBO, 0, sizeof(position), position);
 	glNamedBufferSubData(VBO, sizeof(position), sizeof(woodenBoxTex), woodenBoxTex);
 	glNamedBufferSubData(VBO, sizeof(position) + sizeof(woodenBoxTex), sizeof(smileFaceTex), smileFaceTex);
-
-	//ReadBackBuffer(VBO, sizeof(position) + sizeof(texCoord));
 }
 
 //顶点数组对象初始化
@@ -234,7 +225,7 @@ void InitVAO(GLuint &VAO, GLuint &VBO)
 	glEnableVertexArrayAttrib(VAO, 0);
 
 	//将VBO木箱纹理坐标绑定到VAO第一个绑定点上
-	glVertexArrayVertexBuffer(VAO, 1, VBO, 108 * sizeof(float), 2 * sizeof(float));
+	glVertexArrayVertexBuffer(VAO, 1, VBO, 72 * sizeof(float), 2 * sizeof(float));
 	//设置木箱纹理坐标数据解析格式
 	glVertexArrayAttribFormat(VAO, 1, 2, GL_FLOAT, GL_FALSE, 0);
 	//将木箱纹理坐标和木箱纹理坐标索引相关联
@@ -243,7 +234,7 @@ void InitVAO(GLuint &VAO, GLuint &VBO)
 	glEnableVertexArrayAttrib(VAO, 1);
 
 	//将VBO笑脸纹理坐标绑定到VAO第二个绑定点上
-	glVertexArrayVertexBuffer(VAO, 2, VBO, 180 * sizeof(float), 2 * sizeof(float));
+	glVertexArrayVertexBuffer(VAO, 2, VBO, 120 * sizeof(float), 2 * sizeof(float));
 	//设置笑脸纹理坐标属性数据解析格式
 	glVertexArrayAttribFormat(VAO, 2, 2, GL_FLOAT, GL_FALSE, 0);
 	//将笑脸纹理坐标和笑脸纹理坐标索引相关联
@@ -253,22 +244,20 @@ void InitVAO(GLuint &VAO, GLuint &VBO)
 
 	//绑定VAO
 	glBindVertexArray(VAO);
-
-	//ReadBackVertexAttrib(1);
 }
 
-//索引数组初始化
+//索引缓冲初始化
 void InitEBO(GLuint &EBO)
 {
 	//索引
-	static const unsigned int indices[12][3] =
+	static const unsigned char indices[12][3] =
 	{
-		{ 3, 5, 7 },{ 3, 4, 7 },
-		{ 0, 1, 6 },{ 0, 2, 6 },
-		{ 1, 6, 7 },{ 1, 5, 7 },
-		{ 0, 2, 4 },{ 0, 3, 4 },
-		{ 2, 6, 7 },{ 2, 4, 7 },
-		{ 0, 1, 5 },{ 0, 3, 5 },
+		{  0,  1,  2 },{  0,  3,  2 },
+		{  4,  5,  6 },{  4,  7,  6 },
+		{  8,  9, 10 },{  8, 11, 10 },
+		{ 12, 13, 14 },{ 12, 15, 14 },
+		{ 16, 17, 18 },{ 16, 19, 18 },
+		{ 20, 21, 22 },{ 20, 23, 22 },
 	};
 	//创建缓存对象
 	glCreateBuffers(1, &EBO);
@@ -359,11 +348,12 @@ void SetUniform(GLuint &program)
 void InitCoordMatrix(GLuint program, float WHP)
 {
 	int location;
+
 	//获取模型矩阵位置
 	location = glGetUniformLocation(program, "model");
-	//生成模型矩阵
+	//生成观察矩阵
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::rotate(model,  (float)glfwGetTime() * glm::radians(-55.0f), glm::vec3(1, 0, 0));
+	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(0, 0, -3.0f));
 	//传值给顶点着色器
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(model));
 
@@ -379,30 +369,52 @@ void InitCoordMatrix(GLuint program, float WHP)
 	location = glGetUniformLocation(program, "projection");
 	//生成投影矩阵
 	glm::mat4 projection = glm::mat4(1.0f);
-	projection = glm::perspective(45.0f, WHP, 0.f, 100.0f);
+	projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
 	//传值给顶点着色器
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(projection));
-}
-
-//顺序绘制
-void DrawArray()
-{
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-}
-
-//索引绘制
-void DrawElements()
-{
-	//索引绘制
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 }
 
 //处理键盘输入
 void ProcessInput(GLFWwindow *window, GLuint program)
 {
+	//获取观察矩阵位置
+	int location;
+	location = glGetUniformLocation(program, "view");
+	//初始化位置
+	static glm::vec3 coord = glm::vec3(0, 0, 0);
+	//初始化观察矩阵
+	glm::mat4 view = glm::mat4(1.0f);
+	view = glm::translate(view, glm::vec3(0, 0, -3.0f));
+	//增量
+	float delta = 0.1f;
+
 	//ESC键退出程序
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
+	//W键向前移动
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	{
+		coord += glm::vec3(0, 0, delta);
+	}
+	//S键向后移动
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	{
+		coord -= glm::vec3(0, 0, delta);
+	}
+	//A键向左移动
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	{
+		coord += glm::vec3(delta, 0, 0);
+	}
+	//D键向右移动
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	{
+		coord -= glm::vec3(delta, 0, 0);
+	}
+
+	//将变换之后的矩阵传入顶点着色器
+	view = glm::translate(view, coord);
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(view));
 }
