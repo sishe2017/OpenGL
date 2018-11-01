@@ -5,8 +5,7 @@ using namespace std;
 
 
 Camera::Camera(glm::vec3 cameraPosition, GLuint program, const char *viewName)
-	:positon(cameraPosition),
-	program(program)
+	:positon(cameraPosition)
 {
 	//获取观察矩阵的位置
 	location = glGetUniformLocation(program, viewName);

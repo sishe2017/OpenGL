@@ -1,17 +1,25 @@
 #include <iostream>
 #include <sstream>
-#include "Library/ReadBack.h"
 #include "Library/stb_image.h"
 #include "Library/glm/glm.hpp"
 #include "Library/glm/gtc/matrix_transform.hpp"
 #include "Library/glm/gtc/type_ptr.hpp"
-#include "Library/Shader.h"
-#include "Library/Camera.h"
+
+#include "SimpleEngine/GameObject.h"
+#include "SimpleEngine/Camera.h"
+#include "SimpleEngine/Engine.h"
+#include "SimpleEngine/Transform.h"
 
 using namespace std;
 
-//着色器初始化
-GLuint InitShader();
+//参数
+struct Param
+{
+	GameObject *box;
+	GLFWwindow *window;
+	Camera *camera;
+};
+
 //缓存对象初始化
 void InitVBO(GLuint &VBO);
 //顶点数组对象初始化
@@ -22,38 +30,22 @@ void InitEBO(GLuint &EBO);
 void SetUniform(GLuint &program);
 //纹理对象初始化
 void InitTexture();
-//初始化投影矩阵
-void InitProjection(GLuint program);
 //处理键盘输入
 void ProcessInput(GLFWwindow *window, Camera &camera);
+//更新函数
+void Update(void *param);
 
 int main()
 {
-	//初始化工作
-	glfwInit();
-	//设置OpenGL版本为4.5
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-	//设置为核心模式
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	//创建游戏引擎
+	Engine engine;
+	//创建主窗口
+	GLFWwindow *mainWindow = engine.CreateMainWindow("BoxRotate", 512, 512);
+	//创建箱子的着色器程序
+	GLuint boxProgram = engine.CreateShaderProgram("E:/OpenGLProject/Camera/Camera/Camera.vert", "E:/OpenGLProject/Camera/Camera/Camera.frag");
+	//初始化投影矩阵
+	engine.InitProjection(boxProgram);
 
-	//创建窗口
-	GLFWwindow *window = glfwCreateWindow(512, 512, "TestWindow", NULL, NULL);
-	//告诉GLFW窗口的上下文
-	glfwMakeContextCurrent(window);
-
-	//初始化GLAD
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
-		std::cout << "Failed to initialize GLAD" << std::endl;
-		return -1;
-	}
-
-	//调整视口
-	glViewport(0, 0, 512, 512);
-
-	//初始化着色器
-	GLuint program = InitShader();
 	//初始化缓存对象
 	GLuint VBO;
 	InitVBO(VBO);
@@ -64,91 +56,41 @@ int main()
 	GLuint EBO;
 	InitEBO(EBO);
 	//设置纹理单元位置值
-	SetUniform(program);
+	SetUniform(boxProgram);
 	//初始化纹理对象
 	InitTexture();
 	//初始化摄像机
-	Camera camera(glm::vec3(0, 0, 6.0f), program, "view");
-	//初始化投影矩阵
-	InitProjection(program);
-	//启用深度测试
-	glEnable(GL_DEPTH_TEST);
+	Camera camera(glm::vec3(0, 0, 6.0f), boxProgram, "view");
 
-	//背景颜色为白色
-	float background[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	//初试深度值
-	GLfloat initDepth = 1;
-	//uniform变量位置
-	int location;
-	//模型矩阵
-	glm::mat4 model;
 
-	//10个箱子的坐标值
-	glm::vec3 boxCoord[10] =
+	//10个箱子
+	GameObject box[10];
+	//初始化transform组件
+	for (int i = 0; i < 10; i++)
 	{
-		glm::vec3( 0.0f,  0.0f,   0.0f),
-		glm::vec3( 2.0f,  5.0f, -15.0f),
-		glm::vec3(-1.5f, -2.2f,  -2.5f),
-		glm::vec3(-3.8f, -2.0f, -12.3f),
-		glm::vec3( 2.4f, -0.4f,  -3.5f),
-		glm::vec3(-1.7f,  3.0f,  -7.5f),
-		glm::vec3( 1.3f, -2.0f,  -2.5f),
-		glm::vec3( 1.5f,  2.0f,  -2.5f),
-		glm::vec3( 1.5f,  0.2f,  -1.5f),
-		glm::vec3(-1.3f,  1.0f,  -1.5f)
-	};
-
-	//事件循环
-	while (!glfwWindowShouldClose(window))
-	{
-		//处理键盘输入
-		ProcessInput(window, camera);
-		//清除颜色缓存
-		glClearBufferfv(GL_COLOR, 0, background);
-		//清除深度缓存
-		glClearBufferfv(GL_DEPTH, 0, &initDepth);
-
-		//画十个箱子
-		for (int i = 0; i < 10; i++)
-		{
-			//初始化模型矩阵
-			model = glm::mat4(1.0f);
-			//设置每个箱子在世界坐标中的位置
-			model = glm::translate(model, boxCoord[i]);
-			//旋转箱子
-			model = glm::rotate(model, (float)glfwGetTime() * glm::radians(-55.0f), glm::vec3(1, 1, 0));
-			//获取模型矩阵位置
-			location = glGetUniformLocation(program, "model");
-			//传值给着色器程序
-			glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(model));
-			//画出箱子
-			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, NULL);
-		}
-
-		glfwSwapBuffers(window);
-		glfwPollEvents();
+		box[i].trasform = new Transform(boxProgram);
 	}
+	//设置10个箱子的位置值
+	box[0].trasform->Position(glm::vec3(0.0f, 0.0f, 0.0f));
+	box[1].trasform->Position(glm::vec3(2.0f, 5.0f, -15.0f));
+	box[2].trasform->Position(glm::vec3(-1.5f, -2.2f, -2.5f));
+	box[3].trasform->Position(glm::vec3(-3.8f, -2.0f, -12.3f));
+	box[4].trasform->Position(glm::vec3(2.4f, -0.4f, -3.5f));
+	box[5].trasform->Position(glm::vec3(-1.7f, 3.0f, -7.5f));
+	box[6].trasform->Position(glm::vec3(1.3f, -2.0f, -2.5f));
+	box[7].trasform->Position(glm::vec3(1.5f, 2.0f, -2.5f));
+	box[8].trasform->Position(glm::vec3(1.5f, 0.2f, -1.5f));
+	box[9].trasform->Position(glm::vec3(-1.3f, 1.0f, -1.5f));
 
-	glfwDestroyWindow(window);
-	glfwTerminate();
+	//设置参数
+	Param param;
+	param.box = box;
+	param.window = mainWindow;
+	param.camera = &camera;
+	//启动引擎
+	engine.Run(Update, &param);
 
 	return 0;
-}
-
-//着色器初始化
-GLuint InitShader()
-{
-	Shader shader;
-	//编译顶点着色器
-	shader.CompileVertex("E:/OpenGLProject/Camera/Camera/Camera.vert");
-	//编译片元着色器
-	shader.CompileFrag("E:/OpenGLProject/Camera/Camera/Camera.frag");
-	//链接着色器程序
-	shader.LinkProgram();
-	//启动着色器程序
-	shader.RunProgram();
-
-	return shader.program;
 }
 
 //缓存对象初始化
@@ -282,11 +224,11 @@ void InitTexture()
 	//翻转y轴
 	stbi_set_flip_vertically_on_load(true);
 	//获取木箱纹理信息相关数据
-	textureData = stbi_load("C:/Users/hasee/Desktop/container.jpg", &width, &height, &nrChannel, 0);
+	textureData = stbi_load("E:/OpenGLProject/Camera/Camera/Resource/container.jpg", &width, &height, &nrChannel, 0);
 
 	//创建两个纹理对象：木箱纹理和笑脸纹理
 	GLuint texture[2];
-		glCreateTextures(GL_TEXTURE_2D, 2, texture);
+	glCreateTextures(GL_TEXTURE_2D, 2, texture);
 
 	//将木箱纹理对象绑定到纹理单元0上
 	glBindTextureUnit(0, texture[0]);
@@ -301,7 +243,7 @@ void InitTexture()
 	//翻转y轴
 	stbi_set_flip_vertically_on_load(true);
 	//获取笑脸纹理数据
-	textureData = stbi_load("C:/Users/hasee/Desktop/awesomeface.png", &width, &height, &nrChannel, 0);
+	textureData = stbi_load("E:/OpenGLProject/Camera/Camera/Resource/awesomeface.png", &width, &height, &nrChannel, 0);
 
 	//将笑脸纹理对象绑定到纹理单元1上
 	glBindTextureUnit(1, texture[1]);
@@ -331,19 +273,6 @@ void InitTexture()
 
 	//释放纹理数据
 	stbi_image_free(textureData);
-}
-
-//初始化投影矩阵
-void InitProjection(GLuint program)
-{
-	int location;
-	//获取投影矩阵位置
-	location = glGetUniformLocation(program, "projection");
-	//生成投影矩阵
-	glm::mat4 projection = glm::mat4(1.0f);
-	projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
-	//传值给顶点着色器
-	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(projection));
 }
 
 //设置uniform值
@@ -405,5 +334,20 @@ void ProcessInput(GLFWwindow *window, Camera &camera)
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 	{
 		camera.HeadingRotate(Direction::Right);
+	}
+}
+
+//更新函数
+void Update(void * param)
+{
+	Param *paraGroup = (Param*)param;
+
+	ProcessInput(paraGroup->window, *paraGroup->camera);
+	for (int i = 0; i < 10; i++)
+	{
+		//旋转10个箱子
+		paraGroup->box[i].trasform->Rotate(glm::vec3(-2.0f, -2.0f, 0));
+		//画出箱子
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, NULL);
 	}
 }

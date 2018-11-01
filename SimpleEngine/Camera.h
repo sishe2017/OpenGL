@@ -1,9 +1,9 @@
 #pragma once
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
+#include "../Library/glm/glm.hpp"
+#include "../Library/glm/gtc/matrix_transform.hpp"
+#include "../Library/glm/gtc/type_ptr.hpp"
 
 //摄像机移动方向
 enum class Direction
@@ -57,8 +57,6 @@ private:
 	float speed = 0.1f;
 	//摄像机旋转速度
 	float rotateSpeed = 1.0f;
-	//观察矩阵所在的着色器程序
-	GLuint program;
 	//观察矩阵
 	glm::mat4 view;
 	//观察矩阵在着色器程序中的位置
