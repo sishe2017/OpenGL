@@ -9,6 +9,7 @@
 #include "SimpleEngine/Camera.h"
 #include "SimpleEngine/Engine.h"
 #include "SimpleEngine/Transform.h"
+#include "SimpleEngine/Object.h"
 
 using namespace std;
 
@@ -20,12 +21,8 @@ struct Param
 	Camera *camera;
 };
 
-//缓存对象初始化
-void InitVBO(GLuint &VBO);
-//顶点数组对象初始化
-void InitVAO(GLuint &VAO, GLuint &VBO);
-//索引数组初始化
-void InitEBO(GLuint &EBO);
+//对象数据初始化
+void InitObject();
 //设置uniform变量
 void SetUniform(GLuint &program);
 //纹理对象初始化
@@ -46,22 +43,14 @@ int main()
 	//初始化投影矩阵
 	engine.InitProjection(boxProgram);
 
-	//初始化缓存对象
-	GLuint VBO;
-	InitVBO(VBO);
-	//初始化顶点数组对象
-	GLuint VAO;
-	InitVAO(VAO, VBO);
-	//初始化索引缓冲
-	GLuint EBO;
-	InitEBO(EBO);
+	//初始化对象数据
+	InitObject();
 	//设置纹理单元位置值
 	SetUniform(boxProgram);
 	//初始化纹理对象
 	InitTexture();
 	//初始化摄像机
 	Camera camera(glm::vec3(0, 0, 6.0f), boxProgram, "view");
-
 
 	//10个箱子
 	GameObject box[10];
@@ -93,9 +82,10 @@ int main()
 	return 0;
 }
 
-//缓存对象初始化
-void InitVBO(GLuint &VBO)
+//对象数据初始化
+void InitObject()
 {
+	//顶点位置
 	const float position[24][3] =
 	{
 		//x =  0.5
@@ -143,57 +133,8 @@ void InitVBO(GLuint &VBO)
 		{ 0, 0 },{ 1, 0 },{ 1, 1 },{ 0, 1 },
 	};
 
-	//创建缓存对象
-	glCreateBuffers(1, &VBO);
-	//为缓存对象分配空间
-	glNamedBufferStorage(VBO, sizeof(position) + sizeof(woodenBoxTex) + sizeof(smileFaceTex), nullptr, GL_DYNAMIC_STORAGE_BIT);
-	//初始化缓存对象
-	glNamedBufferSubData(VBO, 0, sizeof(position), position);
-	glNamedBufferSubData(VBO, sizeof(position), sizeof(woodenBoxTex), woodenBoxTex);
-	glNamedBufferSubData(VBO, sizeof(position) + sizeof(woodenBoxTex), sizeof(smileFaceTex), smileFaceTex);
-}
-
-//顶点数组对象初始化
-void InitVAO(GLuint &VAO, GLuint &VBO)
-{
-	//创建顶点数组对象
-	glCreateVertexArrays(1, &VAO);
-	//将VBO位置数据绑定到VAO的第0个绑定点上
-	glVertexArrayVertexBuffer(VAO, 0, VBO, 0, 3 * sizeof(float));
-	//设置顶点位置属性数据解析格式
-	glVertexArrayAttribFormat(VAO, 0, 3, GL_FLOAT, GL_FALSE, 0);
-	//将位置数据和顶点位置索引相关联
-	glVertexArrayAttribBinding(VAO, 0, 0);
-	//启用顶点位置属性
-	glEnableVertexArrayAttrib(VAO, 0);
-
-	//将VBO木箱纹理坐标绑定到VAO第一个绑定点上
-	glVertexArrayVertexBuffer(VAO, 1, VBO, 72 * sizeof(float), 2 * sizeof(float));
-	//设置木箱纹理坐标数据解析格式
-	glVertexArrayAttribFormat(VAO, 1, 2, GL_FLOAT, GL_FALSE, 0);
-	//将木箱纹理坐标和木箱纹理坐标索引相关联
-	glVertexArrayAttribBinding(VAO, 1, 1);
-	//启用木箱纹理坐标属性
-	glEnableVertexArrayAttrib(VAO, 1);
-
-	//将VBO笑脸纹理坐标绑定到VAO第二个绑定点上
-	glVertexArrayVertexBuffer(VAO, 2, VBO, 120 * sizeof(float), 2 * sizeof(float));
-	//设置笑脸纹理坐标属性数据解析格式
-	glVertexArrayAttribFormat(VAO, 2, 2, GL_FLOAT, GL_FALSE, 0);
-	//将笑脸纹理坐标和笑脸纹理坐标索引相关联
-	glVertexArrayAttribBinding(VAO, 2, 2);
-	//启用笑脸纹理坐标属性
-	glEnableVertexArrayAttrib(VAO, 2);
-
-	//绑定VAO
-	glBindVertexArray(VAO);
-}
-
-//索引缓冲初始化
-void InitEBO(GLuint &EBO)
-{
 	//索引
-	static const unsigned char indices[12][3] =
+	const unsigned char indices[12][3] =
 	{
 		{  0,  1,  2 },{  0,  3,  2 },
 		{  4,  5,  6 },{  4,  7,  6 },
@@ -202,12 +143,14 @@ void InitEBO(GLuint &EBO)
 		{ 16, 17, 18 },{ 16, 19, 18 },
 		{ 20, 21, 22 },{ 20, 23, 22 },
 	};
-	//创建缓存对象
-	glCreateBuffers(1, &EBO);
-	//为缓存对象分配空间并初始化
-	glNamedBufferStorage(EBO, sizeof(indices), indices, 0);
-	//将缓存对象绑定到索引数组中
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
+
+	Object object;
+	object.LoadVertexData((const float *)position, 24, 3);
+	object.LoadVertexData((const float *)woodenBoxTex, 24, 2);
+	object.LoadVertexData((const float *)smileFaceTex, 24, 2);
+	object.CommitData();
+	object.LoadElements((const unsigned char *)indices, 36);
 }
 
 //纹理对象初始化
