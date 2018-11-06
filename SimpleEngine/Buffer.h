@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 
 
-//对象
+//缓存对象
 class Buffer
 {
 public:
