@@ -1,15 +1,15 @@
-#include "Object.h"
+#include "Buffer.h"
 
-Object::Object()
+Buffer::Buffer()
 {
 }
 
-Object::~Object()
+Buffer::~Buffer()
 {
 }
 
 //载入顶点数据
-void Object::LoadVertexData(const float * data, int numVertex, int size)
+void Buffer::LoadVertexData(const float * data, int numVertex, int size)
 {
 	vertexData.push_back(data);
 	vertexNum.push_back(numVertex);
@@ -17,7 +17,7 @@ void Object::LoadVertexData(const float * data, int numVertex, int size)
 }
 
 //载入索引绘制数据
-void Object::LoadElements(const unsigned char *data, int num)
+void Buffer::LoadElements(const unsigned char *data, int num)
 {
 	GLuint EBO;
 	//创建缓存对象
@@ -29,7 +29,7 @@ void Object::LoadElements(const unsigned char *data, int num)
 }
 
 //提交数据
-void Object::CommitData()
+void Buffer::CommitData()
 {
 	//创建缓存对象
 	GLuint VBO;
@@ -51,7 +51,6 @@ void Object::CommitData()
 	}
 
 	//创建顶点数组
-	GLuint VAO;
 	glCreateVertexArrays(1, &VAO);
 	//将顶点数据绑定到顶点属性上
 	offset = 0;
@@ -68,6 +67,10 @@ void Object::CommitData()
 		//记录偏移
 		offset += sizeof(float) * vertexNum[i] * vertexSize[i];
 	}
+}
 
+//绑定缓存
+void Buffer::Bind()
+{
 	glBindVertexArray(VAO);
 }

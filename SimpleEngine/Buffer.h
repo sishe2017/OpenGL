@@ -5,11 +5,11 @@
 
 
 //对象
-class Object
+class Buffer
 {
 public:
-	Object();
-	~Object();
+	Buffer();
+	~Buffer();
 
 	//载入顶点数据
 	void LoadVertexData(const float *data, int numVertex, int size);
@@ -17,7 +17,8 @@ public:
 	void LoadElements(const unsigned char *data, int num);
 	//提交数据
 	void CommitData();
-
+	//绑定缓存
+	void Bind();
 
 	//顶点数据集合
 	std::vector<const float *> vertexData;
@@ -25,4 +26,6 @@ public:
 	std::vector<int> vertexNum;
 	//对应顶点数据集的顶点分量
 	std::vector<int> vertexSize;
+	//顶点数组对象
+	GLuint VAO;
 };

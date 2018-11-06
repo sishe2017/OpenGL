@@ -48,19 +48,17 @@ GLFWwindow * Engine::CreateMainWindow(const char * windowName, int width, int he
 }
 
 //创建着色器程序
-GLuint Engine::CreateShaderProgram(const char * vertexPath, const char * fragPath)
+Shader *Engine::CreateShaderProgram(const char * vertexPath, const char * fragPath)
 {
-	Shader shader;
+	Shader *shader = new Shader;
 	//编译顶点着色器
-	shader.CompileVertex("E:/OpenGLProject/Camera/Camera/Camera.vert");
+	shader->CompileVertex(vertexPath);
 	//编译片元着色器
-	shader.CompileFrag("E:/OpenGLProject/Camera/Camera/Camera.frag");
+	shader->CompileFrag(fragPath);
 	//链接着色器程序
-	shader.LinkProgram();
-	//启动着色器程序
-	shader.RunProgram();
+	shader->LinkProgram();
 
-	return shader.program;
+	return shader;
 }
 
 //初始化投影矩阵
@@ -74,9 +72,6 @@ void Engine::InitProjection(GLuint program)
 	projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
 	//传值给顶点着色器
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(projection));
-
-	//启用深度测试
-	glEnable(GL_DEPTH_TEST);
 }
 
 //启动引擎

@@ -26,7 +26,7 @@ enum class Direction
 class Camera
 {
 public:
-	Camera(glm::vec3 cameraPosition, GLuint program, const char *viewName);
+	Camera(glm::vec3 cameraPosition);
 	~Camera();
 	//移动摄像机
 	void Move(Direction direction);
@@ -36,6 +36,8 @@ public:
 	void PitchRotate(Direction direction);
 	//偏航角旋转
 	void HeadingRotate(Direction direction);
+	//关联着色器程序
+	void AssociateShader(GLuint program, const char *viewName);
 private:
 	//摄像机位置
 	glm::vec3 positon;

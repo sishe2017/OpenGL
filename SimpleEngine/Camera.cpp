@@ -4,17 +4,9 @@
 using namespace std;
 
 
-Camera::Camera(glm::vec3 cameraPosition, GLuint program, const char *viewName)
+Camera::Camera(glm::vec3 cameraPosition)
 	:positon(cameraPosition)
 {
-	//获取观察矩阵的位置
-	location = glGetUniformLocation(program, viewName);
-	//生成观察矩阵
-	view = glm::lookAt(positon, target, up);
-	//将观察矩阵传入着色器程序
-	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(view));
-	//初始化摄像机和目标之间的距离
-	distance = glm::distance(positon, target);
 }
 
 
@@ -147,4 +139,17 @@ void Camera::HeadingRotate(Direction direction)
 	view = glm::lookAt(positon, target, up);
 	//将观察矩阵传入着色器程序
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(view));
+}
+
+//关联着色器程序
+void Camera::AssociateShader(GLuint program, const char * viewName)
+{
+	//获取观察矩阵的位置
+	location = glGetUniformLocation(program, viewName);
+	//生成观察矩阵
+	view = glm::lookAt(positon, target, up);
+	//将观察矩阵传入着色器程序
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(view));
+	//初始化摄像机和目标之间的距离
+	distance = glm::distance(positon, target);
 }
