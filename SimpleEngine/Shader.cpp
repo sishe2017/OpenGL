@@ -132,3 +132,24 @@ void Shader::RunProgram()
 	glUseProgram(program);
 }
 
+//设置着色器程序中的vec3类型的uniform变量
+void Shader::SetUniform(const char * uniformName, glm::vec3 &value)
+{
+	location = glGetUniformLocation(program, uniformName);
+	glUniform3fv(location, 1, glm::value_ptr(value));
+}
+
+//设置着色器程序中的vec4类型的uniform变量
+void Shader::SetUniform(const char * uniformName, glm::vec4 &value)
+{
+	location = glGetUniformLocation(program, uniformName);
+	glUniform4fv(location, 1, glm::value_ptr(value));
+}
+
+//设置着色器程序中的mat4类型的uniform变量
+void Shader::SetUniform(const char * uniformName, glm::mat4 & value)
+{
+	location = glGetUniformLocation(program, uniformName);
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+}
+

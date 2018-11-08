@@ -1,10 +1,11 @@
 #include "Transform.h"
+#include "Shader.h"
 
 
-Transform::Transform(GLuint program)
+Transform::Transform(Shader *shader, const char *modelName):
+	shader(shader),
+	modelName(modelName)
 {
-	//获取模型矩阵在着色器程序的位置
-	location = glGetUniformLocation(program, "model");
 }
 
 
@@ -55,5 +56,5 @@ void Transform::Rotate(glm::vec3 angle)
 //将变换后的模型矩阵提交给顶点着色器
 void Transform::CommitTransform()
 {
-	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(model));
+	shader->SetUniform(modelName.c_str(), model);
 }

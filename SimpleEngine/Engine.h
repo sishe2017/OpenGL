@@ -6,6 +6,7 @@
 #include "Shader.h"
 
 class Window;
+class Shader;
 
 //引擎
 class Engine
@@ -19,7 +20,7 @@ public:
 	//创建着色器程序
 	Shader *CreateShaderProgram(const char *vertexPath, const char *fragPath);
 	//初始化投影矩阵
-	void InitProjection(GLuint program);
+	void InitProjection(Shader *shader, const char *projectionName);
 	//启动引擎
 	void Run(std::function<void(void *)> update, void *param);
 

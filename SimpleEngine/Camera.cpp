@@ -1,11 +1,12 @@
 #include "Camera.h"
 #include <iostream>
+#include "Shader.h"
 
 using namespace std;
 
 
 Camera::Camera(glm::vec3 cameraPosition)
-	:positon(cameraPosition)
+	:position(cameraPosition)
 {
 }
 
@@ -21,7 +22,7 @@ void Camera::Move(Direction direction)
 	if (direction == Direction::Forward)
 	{
 		//摄像机位置发生前移
-		positon += speed * front;
+		position += speed * front;
 		//摄像机朝向的目标前移
 		target += speed * front;
 	}
@@ -29,7 +30,7 @@ void Camera::Move(Direction direction)
 	else if (direction == Direction::Back)
 	{
 		//摄像机后退
-		positon -= speed * front;
+		position -= speed * front;
 		//摄像机朝向的目标也发生后退
 		target -= speed * front;
 	}
@@ -37,7 +38,7 @@ void Camera::Move(Direction direction)
 	else if (direction == Direction::Left)
 	{
 		//摄像机左移
-		positon -= speed * right;
+		position -= speed * right;
 		//摄像机朝向的目标也左移
 		target -= speed * right;
 	}
@@ -45,14 +46,13 @@ void Camera::Move(Direction direction)
 	else if (direction == Direction::Right)
 	{
 		//摄像机右移
-		positon += speed * right;
+		position += speed * right;
 		//摄像机朝向的目标也右移
 		target += speed * right;
 	}
 
-	//根据新的摄像机位置生成新的观察矩阵
-	view = glm::lookAt(positon, target, up);
-	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(view));
+	//提交变换
+	CommitTransform();
 }
 
 //设置摄像机移动的速度
@@ -93,12 +93,10 @@ void Camera::PitchRotate(Direction direction)
 	//调整上向量
 	up = glm::cross(right, front);
 	//调整摄像机朝向的目标
-	target = positon + distance * front;
-	distance = glm::distance(positon, target);
-	//重新生成观察矩阵
-	view = glm::lookAt(positon, target, up);
-	//将观察矩阵传入着色器程序
-	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(view));
+	target = position + distance * front;
+	distance = glm::distance(position, target);
+	//提交变换
+	CommitTransform();
 }
 
 //偏航角旋转
@@ -133,23 +131,34 @@ void Camera::HeadingRotate(Direction direction)
 	//调整右向量
 	right = glm::cross(front, up);
 	//调整摄像机朝向的目标
-	target = positon + distance * front;
-	distance = glm::distance(positon, target);
-	//重新生成观察矩阵
-	view = glm::lookAt(positon, target, up);
-	//将观察矩阵传入着色器程序
-	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(view));
+	target = position + distance * front;
+	distance = glm::distance(position, target);
+	//提交变换
+	CommitTransform();
 }
 
 //关联着色器程序
-void Camera::AssociateShader(GLuint program, const char * viewName)
+void Camera::AssociateShader(Shader *shader, const char * viewName)
 {
-	//获取观察矩阵的位置
-	location = glGetUniformLocation(program, viewName);
-	//生成观察矩阵
-	view = glm::lookAt(positon, target, up);
-	//将观察矩阵传入着色器程序
-	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(view));
+	this->shader = shader;
+	this->viewName = viewName;
+	//提交变换
+	CommitTransform();
 	//初始化摄像机和目标之间的距离
-	distance = glm::distance(positon, target);
+	distance = glm::distance(position, target);
+}
+
+//传递摄像机位置
+void Camera::TranmitPosition(Shader * shader, const char * positionName)
+{
+	shader->SetUniform(positionName, position);
+}
+
+//提交变换结果
+void Camera::CommitTransform()
+{
+	//重新生成观察矩阵
+	view = glm::lookAt(position, target, up);
+	//设置观察矩阵变量
+	shader->SetUniform(viewName.c_str(), view);
 }

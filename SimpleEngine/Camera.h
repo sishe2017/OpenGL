@@ -4,6 +4,10 @@
 #include "../Library/glm/glm.hpp"
 #include "../Library/glm/gtc/matrix_transform.hpp"
 #include "../Library/glm/gtc/type_ptr.hpp"
+#include <string>
+
+//着色器
+class Shader;
 
 //摄像机移动方向
 enum class Direction
@@ -37,10 +41,13 @@ public:
 	//偏航角旋转
 	void HeadingRotate(Direction direction);
 	//关联着色器程序
-	void AssociateShader(GLuint program, const char *viewName);
+	void AssociateShader(Shader *shader, const char *viewName);
+	//传递摄像机位置
+	void TranmitPosition(Shader *shader, const char *positionName);
+	
 private:
 	//摄像机位置
-	glm::vec3 positon;
+	glm::vec3 position;
 	//摄像机的前向量
 	glm::vec3 front = glm::vec3(0, 0, -1.0f);
 	//摄像机的上向量
@@ -61,7 +68,11 @@ private:
 	float rotateSpeed = 1.0f;
 	//观察矩阵
 	glm::mat4 view;
-	//观察矩阵在着色器程序中的位置
-	int location;
+	//与摄像机相关联的着色器
+	Shader *shader;
+	//观察矩阵的名字
+	std::string viewName;
+	//提交变换结果
+	void CommitTransform();
 };
 

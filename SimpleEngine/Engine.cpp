@@ -62,16 +62,13 @@ Shader *Engine::CreateShaderProgram(const char * vertexPath, const char * fragPa
 }
 
 //初始化投影矩阵
-void Engine::InitProjection(GLuint program)
+void Engine::InitProjection(Shader *shader, const char *projectionName)
 {
-	int location;
-	//获取投影矩阵位置
-	location = glGetUniformLocation(program, "projection");
 	//生成投影矩阵
 	glm::mat4 projection = glm::mat4(1.0f);
 	projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
-	//传值给顶点着色器
-	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(projection));
+	//设置投影矩阵
+	shader->SetUniform(projectionName, projection);
 }
 
 //启动引擎
