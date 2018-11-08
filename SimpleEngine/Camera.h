@@ -42,8 +42,6 @@ public:
 	void HeadingRotate(Direction direction);
 	//关联着色器程序
 	void AssociateShader(Shader *shader, const char *viewName);
-	//传递摄像机位置
-	void TranmitPosition(Shader *shader, const char *positionName);
 	
 private:
 	//摄像机位置

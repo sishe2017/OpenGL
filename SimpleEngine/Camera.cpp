@@ -148,12 +148,6 @@ void Camera::AssociateShader(Shader *shader, const char * viewName)
 	distance = glm::distance(position, target);
 }
 
-//传递摄像机位置
-void Camera::TranmitPosition(Shader * shader, const char * positionName)
-{
-	shader->SetUniform(positionName, position);
-}
-
 //提交变换结果
 void Camera::CommitTransform()
 {
