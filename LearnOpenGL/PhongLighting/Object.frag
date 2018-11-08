@@ -25,10 +25,10 @@ void main()
 
 	//计算入射光线方向
 	vec3 lightDirection = normalize(vLightPosition - fragPosition);
-	//计算当前片元的漫反射系数
-	float KDiffuse = max(dot(normalize(fragNormal),lightDirection), 0.0f);
+	//漫反射系数
+	float KDiffuse = 1;
 	//计算漫反射分量
-	vec4 diffuse = vec4(lightColor, 1) * KDiffuse;
+	vec4 diffuse = vec4(lightColor, 1) * KDiffuse * max(dot(normalize(fragNormal),lightDirection), 0.0f);
 
 	//计算当前片元到观察点的方向
 	vec3 viewDirection = normalize(-fragPosition);
@@ -40,5 +40,5 @@ void main()
 	vec4 specular = vec4(lightColor, 1) * KSpecular * pow(max(dot(viewDirection, reflectDirection), 0.0f), 32);
 
 	//输出最终片元
-	lastColor = (ambient + diffuse + specular) * objectColor;
+	lastColor = (ambient + diffuse) * objectColor + specular;
 }
