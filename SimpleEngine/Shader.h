@@ -20,6 +20,8 @@ public:
 	void LinkProgram();
 	//运行程序
 	void RunProgram();
+	//设置着色器程序中的float类型的uniform变量
+	void SetUniform(const char *uniformName, float &value);
 	//设置着色器程序中的vec3类型的uniform变量
 	void SetUniform(const char *uniformName, glm::vec3 &value);
 	//设置着色器程序中的vec4类型的uniform变量

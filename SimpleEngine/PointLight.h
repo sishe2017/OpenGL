@@ -12,14 +12,17 @@ public:
 	PointLight(glm::vec3 position, glm::vec3 color);
 	~PointLight();
 
+	//将点光源和着色器关联
+	void AssociateShader(Shader *shader, const char *positionName, const char *colorName);
+	//设置衰减因子
+	void SetAttenuation(float expFactor, float linearFactor, float constantFactor, const char *expName, const char *linearName, const char *constantName);
+
+private:
 	//点光源的位置
 	glm::vec3 position;
 	//点光源的颜色
 	glm::vec3 color;
-	//将点光源和着色器关联
-	void AssociateShader(Shader *shader, const char *positionName, const char *colorName);
-
-private:
-	int location;
+	//和点光源关联的着色器
+	Shader *shader;
 };
 

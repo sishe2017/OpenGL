@@ -132,6 +132,13 @@ void Shader::RunProgram()
 	glUseProgram(program);
 }
 
+//设置着色器程序中的float类型的uniform变量
+void Shader::SetUniform(const char * uniformName, float & value)
+{
+	location = glGetUniformLocation(program, uniformName);
+	glUniform1f(location, value);
+}
+
 //设置着色器程序中的vec3类型的uniform变量
 void Shader::SetUniform(const char * uniformName, glm::vec3 &value)
 {
