@@ -136,6 +136,7 @@ void Shader::RunProgram()
 void Shader::SetUniform(const char * uniformName, float & value)
 {
 	location = glGetUniformLocation(program, uniformName);
+	ErrorHandling();
 	glUniform1f(location, value);
 }
 
@@ -143,6 +144,7 @@ void Shader::SetUniform(const char * uniformName, float & value)
 void Shader::SetUniform(const char * uniformName, glm::vec3 &value)
 {
 	location = glGetUniformLocation(program, uniformName);
+	ErrorHandling();
 	glUniform3fv(location, 1, glm::value_ptr(value));
 }
 
@@ -150,6 +152,7 @@ void Shader::SetUniform(const char * uniformName, glm::vec3 &value)
 void Shader::SetUniform(const char * uniformName, glm::vec4 &value)
 {
 	location = glGetUniformLocation(program, uniformName);
+	ErrorHandling();
 	glUniform4fv(location, 1, glm::value_ptr(value));
 }
 
@@ -157,6 +160,16 @@ void Shader::SetUniform(const char * uniformName, glm::vec4 &value)
 void Shader::SetUniform(const char * uniformName, glm::mat4 & value)
 {
 	location = glGetUniformLocation(program, uniformName);
+	ErrorHandling();
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+}
+
+//没找到uniform变量的错误处理
+void Shader::ErrorHandling()
+{
+	if (location == -1)
+	{
+		//throw (out_of_range)"don't find uniform";
+	}
 }
 

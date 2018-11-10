@@ -2,6 +2,7 @@
 #include "../Library/glm/glm.hpp"
 #include "../Library/glm/gtc/matrix_transform.hpp"
 #include "../Library/glm/gtc/type_ptr.hpp"
+#include <string>
 
 class Shader;
 
@@ -16,6 +17,12 @@ public:
 	void AssociateShader(Shader *shader, const char *positionName, const char *colorName);
 	//设置衰减因子
 	void SetAttenuation(float expFactor, float linearFactor, float constantFactor, const char *expName, const char *linearName, const char *constantName);
+	//设置环境光分量
+	void SetAmbient(glm::vec3 ambient, const char *ambientName);
+	//设置漫反射光分量
+	void SetDiffuse(glm::vec3 diffuse, const char *diffuseName);
+	//设置镜面高光分量
+	void SetSpecular(glm::vec3 specular, const char *specularName);
 
 private:
 	//点光源的位置
@@ -24,5 +31,17 @@ private:
 	glm::vec3 color;
 	//和点光源关联的着色器
 	Shader *shader;
+	//点光源的环境光分量
+	glm::vec3 ambient;
+	//点光源的漫反射光分量
+	glm::vec3 diffuse;
+	//点光源的镜面高光分量
+	glm::vec3 specular;
+	//环境光名字
+	std::string ambientName;
+	//漫反射光名字
+	std::string diffuseName;
+	//镜面高光名字
+	std::string specularName;
 };
 

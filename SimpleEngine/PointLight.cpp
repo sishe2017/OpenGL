@@ -18,8 +18,12 @@ void PointLight::AssociateShader(Shader *shader, const char * positionName, cons
 {
 	//设置点光源的位置
 	shader->SetUniform(positionName, position);
-	//设置点光源的颜色
-	shader->SetUniform(colorName, color);
+	//设置点光源的环境光分量
+	shader->SetUniform(ambientName.c_str(), ambient);
+	//设置点光源的漫反射光分量
+	shader->SetUniform(diffuseName.c_str(), diffuse);
+	//设置点光源的镜面高光分量
+	shader->SetUniform(specularName.c_str(), specular);
 	//记录着色器
 	this->shader = shader;
 }
@@ -33,4 +37,25 @@ void PointLight::SetAttenuation(float expFactor, float linearFactor, float const
 	shader->SetUniform(linearName, linearFactor);
 	//设置常数项因子
 	shader->SetUniform(constantName, constantFactor);
+}
+
+//设置环境光分量
+void PointLight::SetAmbient(glm::vec3 ambient, const char * ambientName)
+{
+	this->ambient = ambient;
+	this->ambientName = ambientName;
+}
+
+//设置漫反射光分量
+void PointLight::SetDiffuse(glm::vec3 diffuse, const char * diffuseName)
+{
+	this->diffuse = diffuse;
+	this->diffuseName = diffuseName;
+}
+
+//设置镜面高光分量
+void PointLight::SetSpecular(glm::vec3 specular, const char * specularName)
+{
+	this->specular = specular;
+	this->specularName = specularName;
 }

@@ -37,5 +37,7 @@ private:
 	int location;
 	//着色器程序
 	GLuint program;
+	//没找到uniform变量的错误处理
+	void ErrorHandling();
 };
 

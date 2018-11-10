@@ -5,6 +5,7 @@
 
 class Transform;
 class Shader;
+class Material;
 
 //游戏物体
 class GameObject
@@ -17,6 +18,8 @@ public:
 	Transform *transform;
 	//设置物体的颜色
 	void SetColor(glm::vec4 color, const char *colorName);
+	//设置物体的材质
+	void AddMaterial(Material *material);
 private:
 	//和游戏物体关联的着色器
 	Shader *shader;
