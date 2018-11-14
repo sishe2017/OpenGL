@@ -28,12 +28,26 @@ void PointLight::AssociateShader(Shader * shader, const char * positionName)
 {
 	//设置点光源的位置
 	shader->SetUniform(positionName, position);
-	//设置点光源的环境光分量
-	shader->SetUniform(ambientName.c_str(), ambient);
-	//设置点光源的漫反射光分量
-	shader->SetUniform(diffuseName.c_str(), diffuse);
-	//设置点光源的镜面高光分量
-	shader->SetUniform(specularName.c_str(), specular);
+	//设置环境环境光分量
+	if (ambientName != "")
+	{
+		shader->SetUniform(ambientName.c_str(), ambient);
+	}
+	//设置漫反射光分量
+	if (diffuseName != "")
+	{
+		shader->SetUniform(diffuseName.c_str(), diffuse);
+	}
+	//设置镜面高光分量
+	if (specularName != "")
+	{
+		shader->SetUniform(specularName.c_str(), specular);
+	}
+	//设置光源颜色
+	if (colorName != "")
+	{
+		shader->SetUniform(colorName.c_str(), color);
+	}
 	//记录着色器
 	this->shader = shader;
 }

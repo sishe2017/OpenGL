@@ -24,3 +24,4 @@ void InitBuffer();
 void Update(void *param);
 //¥¶¿Ìº¸≈Ã ‰»Î
 void ProcessInput(GLFWwindow *window, Camera &camera);
+

@@ -41,6 +41,23 @@ void InitBuffer()
 		//z = -0.5
 		{  0,  0, -1 },{  0,  0, -1 },{  0,  0, -1 },{  0,  0, -1 },
 	};
+	//顶点纹理坐标
+	const float texCoord[24][2] =
+	{
+		//x =  0.5
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },{ 0, 1 },
+		//x = -0.5
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },{ 0, 1 },
+		//y =  0.5
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },{ 0, 1 },
+		//y = -0.5
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },{ 0, 1 },
+		//z =  0.5
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },{ 0, 1 },
+		//z = -0.5
+		{ 0, 0 },{ 1, 0 },{ 1, 1 },{ 0, 1 },
+	};
+
 	//索引
 	const unsigned char indices[12][3] =
 	{
@@ -56,13 +73,13 @@ void InitBuffer()
 	Buffer buffer;
 	buffer.LoadVertexData((const float *)position, 24, 3);
 	buffer.LoadVertexData((const float *)normal, 24, 3);
+	buffer.LoadVertexData((const float *)texCoord, 24, 2);
 	//提交数据
 	buffer.CommitData();
 	//绑定缓存
 	buffer.Bind();
 	//载入索引数据
 	buffer.LoadElements((const unsigned char *)indices, 36);
-
 }
 
 
@@ -73,23 +90,10 @@ void Update(void *param)
 {
 	//参数类型转化
 	Param *drawParam = (Param*)param;
-
-	//处理键盘输入
+	////处理键盘输入
 	ProcessInput(drawParam->mainwindow, *(drawParam->camera));
 
-	//启用灯光着色器程序
-	drawParam->lightShader->RunProgram();
-	//摄像机关联灯光物体着色器程序
-	drawParam->camera->AssociateShader(drawParam->lightShader, "view");
-	//绘制灯光物体
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, NULL);
-
-	//启用被照物体着色器程序
-	drawParam->objectShader->RunProgram();
-	//摄像机关联被照物体的着色器程序
-	drawParam->camera->AssociateShader(drawParam->objectShader, "view");
-
-	drawParam->object->transform->Rotate(glm::vec3(2, 2, 2));
+	drawParam->object->transform->Rotate(glm::vec3(0.5f, 0.5f, 0.5f));
 
 	//绘制被照物体
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, NULL);

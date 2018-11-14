@@ -6,18 +6,14 @@
 
 class Shader;
 
-//点光源
-class PointLight
+//平行光
+class ParallelLight
 {
 public:
-	PointLight(glm::vec3 position);
-	~PointLight();
-
-	//将点光源和着色器关联
-	void AssociateShader(Shader *shader, const char *positionName, const char *colorName);
-	void AssociateShader(Shader *shader, const char *positionName);
-	//设置衰减因子
-	void SetAttenuation(float expFactor, float linearFactor, float constantFactor, const char *expName, const char *linearName, const char *constantName);
+	ParallelLight(glm::vec3 direction);
+	~ParallelLight();
+	//关联指定的着色器
+	void AssociateShader(Shader *shader, const char *directionName);
 	//设置环境光分量
 	void SetAmbient(glm::vec3 ambient, const char *ambientName);
 	//设置漫反射光分量
@@ -28,8 +24,8 @@ public:
 	void SetColor(glm::vec3 color, const char *colorName);
 
 private:
-	//点光源的位置
-	glm::vec3 position;
+	//平行光的方向
+	glm::vec3 direction;
 	//点光源的环境光分量
 	glm::vec3 ambient;
 	//点光源的漫反射光分量
@@ -46,7 +42,4 @@ private:
 	std::string specularName;
 	//光源颜色名字
 	std::string colorName;
-	//和点光源关联的着色器
-	Shader *shader;
 };
-

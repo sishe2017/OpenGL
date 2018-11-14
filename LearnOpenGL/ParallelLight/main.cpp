@@ -5,68 +5,86 @@
 #include "SimpleEngine/Shader.h"
 #include "SimpleEngine/GameObject.h"
 #include "SimpleEngine/ParalllelLight.h"
+#include "SimpleEngine/Material.h"
+#include "SimpleEngine/Texture.h"
 
 int main()
 {
-	//初始化引擎
+	//创建游戏引擎
 	Engine engine;
 	//创建主窗口
-	GLFWwindow *mainWindow = engine.CreateMainWindow("LightScene", 512, 512);
-	//创建灯光物体的着色器程序
-	Shader *lightShader = engine.CreateShaderProgram("E:/OpenGLProject/ParallelLight/ParallelLight/Light.vert", "E:/OpenGLProject/ParallelLight/ParallelLight/Light.frag");
-	//创建被照物体的着色器程序
-	Shader *objectShader = engine.CreateShaderProgram("E:/OpenGLProject/ParallelLight/ParallelLight/Object.vert", "E:/OpenGLProject/ParallelLight/ParallelLight/Object.frag");
+	GLFWwindow *mainWindow = engine.CreateMainWindow("ParallelLight", 512, 512);
+	//创建着色器
+	Shader *shader = engine.CreateShader("E:/OpenGLProject/ParallelLight/ParallelLight/ParallelLight.vert", "E:/OpenGLProject/ParallelLight/ParallelLight/ParallelLight.frag");
 
-	//初始化缓存数据
+	//初始化缓存数组
 	InitBuffer();
-
 	//创建摄像机
 	Camera camera(glm::vec3(0, 0, 6));
-
-	//启动灯光物体着色器程序
-	lightShader->RunProgram();
-	//初始化灯光物体transform组件
-	Transform *lightTransform = new Transform(lightShader, "model");
-	//创建灯光物体
-	GameObject light(lightTransform);
-	//设置灯光物体的位置值
-	light.transform->Position(glm::vec3(3, 2, 4));
-	//将摄像机和灯光着色器关联
-	camera.AssociateShader(lightShader, "view");
+	
+	//运行着色器程序
+	shader->RunProgram();
+	
 	//初始化投影矩阵
-	engine.InitProjection(lightShader, "projection");
+	engine.InitProjection(shader, "projection");
 
-	//启动被照物体着色器程序，并设置一些相关的uniform变量
-	objectShader->RunProgram();
-	//初始化被照物体的transform组件
-	Transform *objectTransform = new Transform(objectShader, "model");
-	//创建被照物体
-	GameObject object(objectTransform);
-	//设置被照物体的颜色
-	object.SetColor(glm::vec4(1, 0.5f, 0, 1), "objectColor");
-	//设置被照物体的位置值
-	object.transform->Position(glm::vec3(0.5f, 0.5f, 0.5f));
-	//将摄像机和被照物体着色器关联
-	camera.AssociateShader(objectShader, "view");
-	//初始化投影矩阵
-	engine.InitProjection(objectShader, "projection");
-	//创建一个平行光
-	ParallelLight parallelLight(glm::vec3(-1.5, -1, -4), glm::vec3(1, 1, 1));
-	//将平行光和着色器关联
-	parallelLight.AssociateShader(objectShader, "wLightDirection", "lightColor");
+	//将摄像机和着色器相关联
+	camera.AssociateShader(shader, "view");
+
+	//创建物体的材质
+	Material material;
+	//设置材质的参数
+	material.SetKSpecular(glm::vec3(0.5f, 0.5f, 0.5f), "material.KSpecular");
+	material.SetKShininess(64.0f, "material.shininess");
+
+	//创建漫反射的二维纹理
+	Texture diffuseTexture(TextureType::TwoD, shader, "material.KDiffuse");
+	//加载纹理数据
+	diffuseTexture.LoadTexture("F:/GitRepository/Resource/container2.png");
+	//设置滤波为线性过滤
+	diffuseTexture.SetTextureProperty(Filter::Linear);
+	//设置纹理环绕为重复
+	diffuseTexture.SetTextureProperty(Wrap::Repeat);
+
+	//创建镜面反射的二维纹理
+	Texture specularTexture(TextureType::TwoD, shader, "material.KSpecular");
+	//加载纹理数据
+	specularTexture.LoadTexture("F:/GitRepository/Resource/container2_specular.png");
+	//设置滤波为线性过滤
+	specularTexture.SetTextureProperty(Filter::Linear);
+	//设置纹理环绕为重复
+	diffuseTexture.SetTextureProperty(Wrap::Repeat);
+	
+	//初始化物体的Transform组件
+	Transform *transform = new Transform(shader, "model");
+	//创建物体
+	GameObject box(transform);
+	//为物体添加材质
+	box.AddMaterial(&material);
+	//设置箱子的位置
+	box.transform->Position(glm::vec3(0.5f, 0.5f, 0.5f));
+	
+	//创建平行光源
+	ParallelLight parallelLight(glm::vec3(0, 0, -2));
+	//设置平行光源的环境光分量
+	parallelLight.SetAmbient(glm::vec3(0.2f, 0.2f, 0.2f), "light.ambient");
+	//设置平行光源的漫反射光分量
+	parallelLight.SetDiffuse(glm::vec3(0.5f, 0.5f, 0.5f), "light.diffuse");
+	//设置平行光源的镜面高光分量
+	parallelLight.SetSpecular(glm::vec3(1, 1, 1), "light.specular");
+	//将平行光源和着色器相关联
+	parallelLight.AssociateShader(shader, "wLightDirection");
 
 	//设置参数
 	Param param;
-	param.camera = &camera;
-	param.lightShader = lightShader;
-	param.objectShader = objectShader;
 	param.mainwindow = mainWindow;
-	param.object = &object;
+	param.camera = &camera;
+	param.object = &box;
 
-	//启用深度测试
+	//开启深度测试
 	glEnable(GL_DEPTH_TEST);
 
-	//运行引擎
+	//开始游戏循环
 	engine.Run(Update, &param);
 
 	return 0;
