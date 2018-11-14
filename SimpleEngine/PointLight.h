@@ -10,11 +10,12 @@ class Shader;
 class PointLight
 {
 public:
-	PointLight(glm::vec3 position, glm::vec3 color);
+	PointLight(glm::vec3 position);
 	~PointLight();
 
 	//将点光源和着色器关联
 	void AssociateShader(Shader *shader, const char *positionName, const char *colorName);
+	void AssociateShader(Shader *shader, const char *positionName);
 	//设置衰减因子
 	void SetAttenuation(float expFactor, float linearFactor, float constantFactor, const char *expName, const char *linearName, const char *constantName);
 	//设置环境光分量
@@ -23,6 +24,8 @@ public:
 	void SetDiffuse(glm::vec3 diffuse, const char *diffuseName);
 	//设置镜面高光分量
 	void SetSpecular(glm::vec3 specular, const char *specularName);
+	//设置光源的颜色
+	void SetColor(glm::vec3 color, const char *colorName);
 
 private:
 	//点光源的位置
@@ -43,5 +46,7 @@ private:
 	std::string diffuseName;
 	//镜面高光名字
 	std::string specularName;
+	//光源颜色名字
+	std::string colorName;
 };
 

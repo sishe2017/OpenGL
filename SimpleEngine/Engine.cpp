@@ -48,7 +48,7 @@ GLFWwindow * Engine::CreateMainWindow(const char * windowName, int width, int he
 }
 
 //创建着色器程序
-Shader *Engine::CreateShaderProgram(const char * vertexPath, const char * fragPath)
+Shader *Engine::CreateShader(const char * vertexPath, const char * fragPath)
 {
 	Shader *shader = new Shader;
 	//编译顶点着色器

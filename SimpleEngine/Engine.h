@@ -18,7 +18,7 @@ public:
 	//创建主窗口
 	GLFWwindow *CreateMainWindow(const char *windowName, int width, int height);
 	//创建着色器程序
-	Shader *CreateShaderProgram(const char *vertexPath, const char *fragPath);
+	Shader *CreateShader(const char *vertexPath, const char *fragPath);
 	//初始化投影矩阵
 	void InitProjection(Shader *shader, const char *projectionName);
 	//启动引擎
@@ -28,7 +28,7 @@ private:
 	//窗口集合
 	std::vector<Window *> vWindow;
 	//背景颜色
-	float background[4] = { 0, 0, 0, 0 };
+	float background[4] = { 0.5f, 0.5f, 0, 0 };
 	//初试深度
 	float initDepth = 1.0f;
 	//主窗口
