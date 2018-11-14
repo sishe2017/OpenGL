@@ -17,7 +17,7 @@ public:
 	void AssociateShader(Shader *shader, const char *positionName, const char *colorName);
 	void AssociateShader(Shader *shader, const char *positionName);
 	//设置衰减因子
-	void SetAttenuation(float expFactor, float linearFactor, float constantFactor, const char *expName, const char *linearName, const char *constantName);
+	void SetAttenuation(float quadraticFactor, float linearFactor, float constantFactor, const char *quadraticName, const char *linearName, const char *constantName);
 	//设置环境光分量
 	void SetAmbient(glm::vec3 ambient, const char *ambientName);
 	//设置漫反射光分量
@@ -38,6 +38,12 @@ private:
 	glm::vec3 specular;
 	//点光源的颜色
 	glm::vec3 color;
+	//点光源的二次项衰减系数
+	float quadratic;
+	//点光源的一次项衰减系数
+	float linear;
+	//点光源的常数项系数
+	float constant;
 	//环境光名字
 	std::string ambientName;
 	//漫反射光名字
@@ -46,7 +52,11 @@ private:
 	std::string specularName;
 	//光源颜色名字
 	std::string colorName;
-	//和点光源关联的着色器
-	Shader *shader;
+	//点光源的二次项衰减系数
+	std::string quadraticName;
+	//点光源的一次项衰减系数
+	std::string linearName;
+	//点光源的常数项系数
+	std::string constantName;
 };
 

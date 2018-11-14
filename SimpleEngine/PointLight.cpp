@@ -19,8 +19,6 @@ void PointLight::AssociateShader(Shader *shader, const char * positionName, cons
 	shader->SetUniform(positionName, position);
 	//设置点光源的颜色
 	shader->SetUniform(colorName, color);
-	//记录着色器
-	this->shader = shader;
 }
 
 //将点光源和着色器关联
@@ -28,19 +26,11 @@ void PointLight::AssociateShader(Shader * shader, const char * positionName)
 {
 	//设置点光源的位置
 	shader->SetUniform(positionName, position);
-	//设置环境环境光分量
+	//设置光源属性
 	if (ambientName != "")
 	{
 		shader->SetUniform(ambientName.c_str(), ambient);
-	}
-	//设置漫反射光分量
-	if (diffuseName != "")
-	{
 		shader->SetUniform(diffuseName.c_str(), diffuse);
-	}
-	//设置镜面高光分量
-	if (specularName != "")
-	{
 		shader->SetUniform(specularName.c_str(), specular);
 	}
 	//设置光源颜色
@@ -48,19 +38,24 @@ void PointLight::AssociateShader(Shader * shader, const char * positionName)
 	{
 		shader->SetUniform(colorName.c_str(), color);
 	}
-	//记录着色器
-	this->shader = shader;
+	//设置衰减系数
+	if (quadraticName != "")
+	{
+		shader->SetUniform(quadraticName.c_str(), quadratic);
+		shader->SetUniform(linearName.c_str(), linear);
+		shader->SetUniform(constantName.c_str(), constant);
+	}
 }
 
 //设置衰减因子
-void PointLight::SetAttenuation(float expFactor, float linearFactor, float constantFactor, const char * expName, const char * linearName, const char * constantName)
+void PointLight::SetAttenuation(float quadraticFactor, float linearFactor, float constantFactor, const char * quadraticName, const char * linearName, const char * constantName)
 {
-	//设置二次项因子
-	shader->SetUniform(expName, expFactor);
-	//设置一次项因子
-	shader->SetUniform(linearName, linearFactor);
-	//设置常数项因子
-	shader->SetUniform(constantName, constantFactor);
+	this->quadratic = quadraticFactor;
+	this->quadraticName = quadraticName;
+	this->linear = linearFactor;
+	this->linearName = linearName;
+	this->constant = constantFactor;
+	this->constantName = constantName;
 }
 
 //设置环境光分量
