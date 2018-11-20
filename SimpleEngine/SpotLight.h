@@ -6,13 +6,17 @@
 
 class Shader;
 
-//点光源的名字集合
-struct PointLightName
+//聚光灯名字集合
+struct SpotLightName
 {
 	//光源颜色名字
 	std::string colorName;
 	//光源位置名字
 	std::string positionName;
+	//光源方向名字
+	std::string directionName;
+	//切光角名字
+	std::string cutoffName;
 	//环境光分量名字
 	std::string ambientName;
 	//漫反射光分量名字
@@ -27,36 +31,38 @@ struct PointLightName
 	std::string constantName;
 };
 
-//点光源
-class PointLight
+class SpotLight
 {
 public:
-	PointLight();
-	~PointLight();
+	SpotLight();
+	~SpotLight();
 
-	//点光源的位置
+	//聚光灯的位置
 	glm::vec3 position;
-	//点光源的颜色
+	//聚光灯的方向
+	glm::vec3 direction;
+	//切光角余弦
+	float cutoff;
+	//光源颜色
 	glm::vec3 color;
-	//将点光源和着色器关联
-	void AssociateShader(Shader *shader, PointLightName *pointLightName);
+	//将聚光灯和着色器管理
+	void AssociateShader(Shader *shader, SpotLightName *spotLightName);
 	//设置环境光，漫反射，镜面高光
 	void SetADS(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
 	//设置衰减模型系数
 	void SetAttenuation(float quadratic, float linear, float constant);
 
 private:
-	//点光源的环境光分量
+	//环境光强度
 	glm::vec3 ambient;
-	//点光源的漫反射光分量
+	//漫反射强度
 	glm::vec3 diffuse;
-	//点光源的镜面高光分量
+	//镜面高光强度
 	glm::vec3 specular;
-	//点光源的二次项衰减系数
+	//二次项衰减系数
 	float quadratic;
-	//点光源的一次项衰减系数
+	//一次项衰减系数
 	float linear;
-	//点光源的常数项系数
+	//常数项衰减系数
 	float constant;
 };
-
