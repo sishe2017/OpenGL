@@ -15,7 +15,7 @@ void SpotLight::AssociateShader(Shader *shader, SpotLightName *spotLightName)
 	//设置聚光灯的位置，方向和切光角
 	shader->SetUniform(spotLightName->positionName.c_str(), position);
 	shader->SetUniform(spotLightName->directionName.c_str(), direction);
-	shader->SetUniform(spotLightName->cutoffName.c_str(), cutoff);
+	shader->SetUniform(spotLightName->interCutOffName.c_str(), interCutOff);
 	//设置光源属性
 	if (spotLightName->ambientName != "")
 	{
@@ -35,6 +35,11 @@ void SpotLight::AssociateShader(Shader *shader, SpotLightName *spotLightName)
 		shader->SetUniform(spotLightName->linearName.c_str(), linear);
 		shader->SetUniform(spotLightName->constantName.c_str(), constant);
 	}
+	//设置外圆锥角
+	if (spotLightName->outerCutOffName != "")
+	{
+		shader->SetUniform(spotLightName->outerCutOffName.c_str(), outerCutOff);
+	}
 }
 
 //设置环境光，漫反射，镜面高光
@@ -51,4 +56,11 @@ void SpotLight::SetAttenuation(float quadratic, float linear, float constant)
 	this->quadratic = quadratic;
 	this->linear = linear;
 	this->constant = constant;
+}
+
+//设置内外圆锥角
+void SpotLight::SetCutOff(float interCutOff, float outerCutOff)
+{
+	this->interCutOff = glm::cos(glm::radians(interCutOff));
+	this->outerCutOff = glm::cos(glm::radians(outerCutOff));
 }

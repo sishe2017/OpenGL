@@ -15,8 +15,10 @@ struct SpotLightName
 	std::string positionName;
 	//光源方向名字
 	std::string directionName;
-	//切光角名字
-	std::string cutoffName;
+	//内圆锥角名字
+	std::string interCutOffName;
+	//外圆锥角的名字
+	std::string outerCutOffName;
 	//环境光分量名字
 	std::string ambientName;
 	//漫反射光分量名字
@@ -41,8 +43,6 @@ public:
 	glm::vec3 position;
 	//聚光灯的方向
 	glm::vec3 direction;
-	//切光角余弦
-	float cutoff;
 	//光源颜色
 	glm::vec3 color;
 	//将聚光灯和着色器管理
@@ -51,6 +51,8 @@ public:
 	void SetADS(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
 	//设置衰减模型系数
 	void SetAttenuation(float quadratic, float linear, float constant);
+	//设置内外圆锥角
+	void SetCutOff(float interCutOff, float outerCutOff);
 
 private:
 	//环境光强度
@@ -65,4 +67,8 @@ private:
 	float linear;
 	//常数项衰减系数
 	float constant;
+	//内圆锥角的余弦
+	float interCutOff;
+	//外圆锥角的余弦
+	float outerCutOff;
 };

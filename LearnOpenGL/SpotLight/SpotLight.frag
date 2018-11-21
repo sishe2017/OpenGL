@@ -15,8 +15,10 @@ struct Material
 //光照属性
 struct Light
 {
-	//切光角的余弦
-	float cutoff;
+	//内圆锥角的余弦
+	float interCutOff;
+	//外圆锥角的余弦
+	float outerCutOff;
 	//环境光照分量
 	vec3 ambient;
 	//漫反射光分量
@@ -52,41 +54,40 @@ out vec4 lastColor;
 
 void main()
 {
+	//计算环境光分量
+	vec4 ambient = vec4(light.ambient * texture(material.KDiffuse, fragTexCoord).rgb, 1);
+
 	//计算入射光方向
 	vec3 incidentLightDir = normalize(fragPosition - vLightPosition);
+	//计算漫反射分量
+	vec4 diffuse = vec4(light.diffuse * texture(material.KDiffuse, fragTexCoord).rgb, 1) * max(dot(-incidentLightDir, fragNormal), 0);
+
+	//计算当前点到视点的方向
+	vec3 viewDirection = normalize(-fragPosition);
+	//计算反射光线的方向
+	vec3 reflectDir = reflect(incidentLightDir, fragNormal);
+	//计算镜面高光分量
+	vec4 specular = vec4(light.specular * material.KSpecular, 1) * pow(max(dot(reflectDir, viewDirection), 0), material.shininess);
+
+	//计算当前点到光源的距离
+	float fragLightDistance = length(fragPosition - vLightPosition);
+	//计算衰减值
+	float attenuation = 1.0 / (light.quadratic * fragLightDistance * fragLightDistance + light.linear * fragLightDistance + light.constant);
+	//光源三个分量乘上衰减值
+	ambient *= attenuation;
+	diffuse *= attenuation;
+	specular *= attenuation;
+
 	//计算入射光方向和聚光灯方向的夹角的余弦
 	float theta = dot(incidentLightDir, vLightDirection);
+	//计算内外圆锥角余弦差值
+	float epsilon = light.interCutOff - light.outerCutOff;
+	//计算聚光灯的在该点的光照强度
+	float intensity = clamp((theta - light.outerCutOff) / epsilon, 0, 1);
+	//漫反射分量和镜面高光分量乘上强度值
+	diffuse  *= intensity;
+	specular *= intensity;
 
-	//如果当前点是否在聚光灯范围内
-	if (theta > light.cutoff)
-	{
-		//计算当前点到光源的距离
-		float fragLightDistance = length(fragPosition - vLightPosition);
-		//计算衰减值
-		float attenuation = 1.0 / (light.quadratic * fragLightDistance * fragLightDistance + light.linear * fragLightDistance + light.constant);
-		
-		//计算环境光分量
-		vec4 ambient = vec4(light.ambient * texture(material.KDiffuse, fragTexCoord).rgb, 1);
-
-		//计算漫反射分量
-		vec4 diffuse = vec4(light.diffuse * texture(material.KDiffuse, fragTexCoord).rgb, 1) * max(dot(-incidentLightDir, fragNormal), 0) * attenuation;
-
-		//计算当前点到视点的方向
-		vec3 viewDirection = normalize(-fragPosition);
-		//计算反射光线的方向
-		vec3 reflectDir = reflect(incidentLightDir, fragNormal);
-		//计算镜面高光分量
-		vec4 specular = vec4(light.specular * material.KSpecular, 1) * pow(max(dot(reflectDir, viewDirection), 0), material.shininess) * attenuation;
-
-		//输出最终的片元
-		lastColor = ambient + diffuse + specular;
-	}
-	//如果当前点在聚光灯范围外
-	else
-	{
-		//只计算环境光分量
-		vec4 ambient = vec4(light.ambient * texture(material.KDiffuse, fragTexCoord).rgb, 1);
-		//输出最终片元
-		lastColor = ambient;
-	}
+	//输出最终片元
+	lastColor = ambient + diffuse + specular;
 }

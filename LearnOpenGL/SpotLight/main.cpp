@@ -68,7 +68,8 @@ int main()
 	SpotLightName spotLightName;
 	spotLightName.positionName = "wLightPosition";
 	spotLightName.directionName = "wLightDirection";
-	spotLightName.cutoffName = "light.cutoff";
+	spotLightName.interCutOffName = "light.interCutOff";
+	spotLightName.outerCutOffName = "light.outerCutOff";
 	spotLightName.ambientName = "light.ambient";
 	spotLightName.diffuseName = "light.diffuse";
 	spotLightName.specularName = "light.specular";
@@ -79,11 +80,11 @@ int main()
 	//创建一个聚光灯
 	SpotLight spotLight;
 	//设置聚光灯的位置
-	spotLight.position = glm::vec3(0.5f, 0.5f, 2.0f);
+	spotLight.position = glm::vec3(0.5f, 0.5f, 2.5f);
 	//设置聚光灯的方向
 	spotLight.direction = glm::vec3(0, 0, -1.0f);
-	//设置聚光灯的切光角
-	spotLight.cutoff = glm::cos(glm::radians(15.0f));
+	//设置聚光灯的内外圆锥角
+	spotLight.SetCutOff(13.0f, 17.0f);
 	//设置环境光分量,漫反射光分量,镜面高光分量
 	spotLight.SetADS(glm::vec3(0.2f), glm::vec3(0.5f), glm::vec3(1.0f));
 	//设置衰减模型系数
