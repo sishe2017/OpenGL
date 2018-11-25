@@ -9,6 +9,12 @@ SpotLight::~SpotLight()
 {
 }
 
+//设置聚光灯的方向
+void SpotLight::SetDirection(glm::vec3 direction)
+{
+	this->direction = glm::normalize(direction);
+}
+
 //将聚光灯和着色器关联
 void SpotLight::AssociateShader(Shader *shader, SpotLightName *spotLightName)
 {

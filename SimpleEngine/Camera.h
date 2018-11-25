@@ -42,6 +42,8 @@ public:
 	void HeadingRotate(Direction direction);
 	//关联着色器程序
 	void AssociateShader(Shader *shader, const char *viewName);
+	//关联着色器程序
+	void AssociateShader(Shader *shader, const char *viewName, const char *viewPosName);
 	
 private:
 	//摄像机位置
@@ -70,6 +72,8 @@ private:
 	Shader *shader;
 	//观察矩阵的名字
 	std::string viewName;
+	//摄像机位置的名字
+	std::string viewPosName;
 	//提交变换结果
 	void CommitTransform();
 };

@@ -148,6 +148,18 @@ void Camera::AssociateShader(Shader *shader, const char * viewName)
 	distance = glm::distance(position, target);
 }
 
+//关联着色器程序
+void Camera::AssociateShader(Shader * shader, const char * viewName, const char * viewPosName)
+{
+	this->shader = shader;
+	this->viewName = viewName;
+	this->viewPosName = viewPosName;
+	//提交变换
+	CommitTransform();
+	//初始化摄像机和目标之间的距离
+	distance = glm::distance(position, target);
+}
+
 //提交变换结果
 void Camera::CommitTransform()
 {
@@ -155,4 +167,9 @@ void Camera::CommitTransform()
 	view = glm::lookAt(position, target, up);
 	//设置观察矩阵变量
 	shader->SetUniform(viewName.c_str(), view);
+	//如果片元处理在世界空间，则设置观察坐标
+	if (viewPosName != "")
+	{
+		shader->SetUniform(viewPosName.c_str(), position);
+	}
 }

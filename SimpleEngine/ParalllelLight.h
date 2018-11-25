@@ -28,19 +28,22 @@ public:
 	ParallelLight();
 	~ParallelLight();
 	
-	//平行光的方向
-	glm::vec3 direction;
-	//点光源的颜色
+	//设置平行光的方向
+	void SetDirection(glm::vec3 direction);
+	//平行光的颜色
 	glm::vec3 color;
 	//关联指定的着色器
 	void AssociateShader(Shader *shader, ParallelLightName *parallelLightName);
 	//设置环境光，漫反射光，镜面高光
 	void SetADS(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
 private:
-	//点光源的环境光分量
+	//平行光的环境光分量
 	glm::vec3 ambient;
-	//点光源的漫反射光分量
+	//平行光的漫反射光分量
 	glm::vec3 diffuse;
-	//点光源的镜面高光分量
+	//平行光的镜面高光分量
 	glm::vec3 specular;
+	//平行光的方向
+	glm::vec3 direction;
+
 };

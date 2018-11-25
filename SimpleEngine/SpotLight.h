@@ -41,8 +41,8 @@ public:
 
 	//聚光灯的位置
 	glm::vec3 position;
-	//聚光灯的方向
-	glm::vec3 direction;
+	//设置聚光灯的方向
+	void SetDirection(glm::vec3 direction);
 	//光源颜色
 	glm::vec3 color;
 	//将聚光灯和着色器管理
@@ -55,6 +55,8 @@ public:
 	void SetCutOff(float interCutOff, float outerCutOff);
 
 private:
+	//聚光灯的方向
+	glm::vec3 direction;
 	//环境光强度
 	glm::vec3 ambient;
 	//漫反射强度

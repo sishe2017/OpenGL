@@ -9,6 +9,12 @@ ParallelLight::~ParallelLight()
 {
 }
 
+//设置平行光的方向
+void ParallelLight::SetDirection(glm::vec3 direction)
+{
+	this->direction = glm::normalize(direction);
+}
+
 //关联指定的着色器
 void ParallelLight::AssociateShader(Shader *shader, ParallelLightName *parallelLightName)
 {
