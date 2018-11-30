@@ -15,6 +15,8 @@ public:
 	void LoadVertexData(const float *data, int numVertex, int size);
 	//载入索引绘制数据
 	void LoadElements(const unsigned char *data, int num);
+	//载入索引绘制数据
+	void LoadElements(const unsigned int *data, int num);
 	//提交数据
 	void CommitData();
 	//绑定缓存
@@ -28,4 +30,11 @@ public:
 	std::vector<int> vertexSize;
 	//顶点数组对象
 	GLuint VAO;
+	//顶点索引对象
+	GLuint EBO;
+	//索引数据类型
+	GLenum indiceType;
+private:
+	//使用索引的标志
+	bool flags = false;
 };

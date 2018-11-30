@@ -44,6 +44,8 @@ public:
 	void AssociateShader(Shader *shader, const char *viewName);
 	//关联着色器程序
 	void AssociateShader(Shader *shader, const char *viewName, const char *viewPosName);
+	//观察矩阵
+	glm::mat4 view;
 	
 private:
 	//摄像机位置
@@ -66,8 +68,7 @@ private:
 	float speed = 0.1f;
 	//摄像机旋转速度
 	float rotateSpeed = 1.0f;
-	//观察矩阵
-	glm::mat4 view;
+
 	//与摄像机相关联的着色器
 	Shader *shader;
 	//观察矩阵的名字

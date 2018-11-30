@@ -6,7 +6,7 @@
 GameObject::GameObject(Transform *transform):
 	transform(transform)
 {
-	shader = transform->shader;
+	shader = transform->GetShader();
 }
 
 GameObject::~GameObject()

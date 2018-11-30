@@ -133,7 +133,7 @@ void Shader::RunProgram()
 }
 
 //设置着色器程序中的整型的uniform变量
-void Shader::SetUniform(const char * uniformName, GLuint & value)
+void Shader::SetUniform(const char * uniformName, GLuint &value)
 {
 	location = glGetUniformLocation(program, uniformName);
 	ErrorHandling();
@@ -141,7 +141,7 @@ void Shader::SetUniform(const char * uniformName, GLuint & value)
 }
 
 //设置着色器程序中的float类型的uniform变量
-void Shader::SetUniform(const char * uniformName, float & value)
+void Shader::SetUniform(const char * uniformName, float &value)
 {
 	location = glGetUniformLocation(program, uniformName);
 	ErrorHandling();

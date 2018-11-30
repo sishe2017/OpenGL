@@ -53,6 +53,21 @@ void Transform::Rotate(glm::vec3 angle)
 	CommitTransform();
 }
 
+//缩放
+void Transform::Scale(glm::vec3 scale)
+{
+	//对模型矩阵进行缩放变换
+	model = glm::scale(model, scale);
+	//提交变换
+	CommitTransform();
+}
+
+//获取transform组件对应的shader
+Shader * Transform::GetShader()
+{
+	return shader;
+}
+
 //将变换后的模型矩阵提交给顶点着色器
 void Transform::CommitTransform()
 {

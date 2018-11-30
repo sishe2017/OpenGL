@@ -28,7 +28,7 @@ private:
 	//窗口集合
 	std::vector<Window *> vWindow;
 	//背景颜色
-	float background[4] = { 0.5f, 0.5f, 0, 0 };
+	float background[4] = { 0.2f, 0.2f, 0.3f, 0 };
 	//初试深度
 	float initDepth = 1.0f;
 	//主窗口

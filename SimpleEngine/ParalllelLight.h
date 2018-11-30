@@ -1,4 +1,4 @@
-#pragma once
+	#pragma once
 #include "../Library/glm/glm.hpp"
 #include "../Library/glm/gtc/matrix_transform.hpp"
 #include "../Library/glm/gtc/type_ptr.hpp"
@@ -45,5 +45,4 @@ private:
 	glm::vec3 specular;
 	//平行光的方向
 	glm::vec3 direction;
-
 };

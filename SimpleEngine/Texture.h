@@ -1,5 +1,7 @@
 #pragma once
 #include <glad/glad.h>
+#include <vector>
+#include <string>
 
 class Shader;
 
@@ -37,7 +39,7 @@ enum class Wrap
 class Texture
 {
 public:
-	Texture(TextureType textureType, Shader *shader, const char *samplerName);
+	Texture(TextureType textureType);
 	~Texture();
 
 	//加载纹理
@@ -46,8 +48,11 @@ public:
 	void SetTextureProperty(Filter filter);
 	//设置纹理环绕
 	void SetTextureProperty(Wrap wrap);
+	//将纹理绑定到纹理单元中
+	void BindUnit(Shader *shader, const char *samplerName, GLuint textureUnit);
 	//边缘颜色
 	float borderColor[4] = { 0 };
+
 private:
 	//纹理类型
 	TextureType textureType;
@@ -55,10 +60,8 @@ private:
 	Filter filter;
 	//纹理环绕方式
 	Wrap wrap;
-	//纹理单元
-	static GLuint textureUnit;
-	//纹理对象
-	GLuint texture;
-	//采样器对象
+	//采样器对象集合
 	GLuint sampler;
+	//纹理对象句柄
+	GLuint texture;
 };

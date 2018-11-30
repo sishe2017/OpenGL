@@ -10,7 +10,6 @@ class Shader;
 
 class Transform
 {
-	friend class GameObject;
 public:
 	Transform(Shader *shader, const char *modelName);
 	~Transform();
@@ -22,7 +21,10 @@ public:
 	void Translate(glm::vec3 distance);
 	//欧拉角旋转
 	void Rotate(glm::vec3 angle);
-
+	//缩放
+	void Scale(glm::vec3 scale);
+	//获取transform组件对应的shader
+	Shader *GetShader();
 private:
 	//物体坐标
 	glm::vec3 position;

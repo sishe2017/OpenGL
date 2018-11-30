@@ -19,13 +19,27 @@ void Buffer::LoadVertexData(const float * data, int numVertex, int size)
 //载入索引绘制数据
 void Buffer::LoadElements(const unsigned char *data, int num)
 {
-	GLuint EBO;
 	//创建缓存对象
 	glCreateBuffers(1, &EBO);
 	//为缓存对象分配空间并初始化
 	glNamedBufferStorage(EBO, num, data, 0);
-	//将缓存对象绑定到索引数组中
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	//使用索引标志设置为true
+	flags = true;
+	//设置索引数据类型
+	indiceType = GL_UNSIGNED_BYTE;
+}
+
+//载入索引绘制数据
+void Buffer::LoadElements(const unsigned int * data, int num)
+{
+	//创建缓存对象
+	glCreateBuffers(1, &EBO);
+	//为缓存对象分配空间并初始化
+	glNamedBufferStorage(EBO, num * sizeof(unsigned int), data, 0);
+	//使用索引标志设置为true
+	flags = true;
+	//设置索引数据类型
+	indiceType = GL_UNSIGNED_INT;
 }
 
 //提交数据
@@ -73,4 +87,9 @@ void Buffer::CommitData()
 void Buffer::Bind()
 {
 	glBindVertexArray(VAO);
+	//如果使用索引，则绑定索引
+	if (flags == true)
+	{
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	}
 }

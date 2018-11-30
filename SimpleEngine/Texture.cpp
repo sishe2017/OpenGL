@@ -2,14 +2,14 @@
 #include "../Library/stb_image.h"
 #include "Shader.h"
 
-GLuint Texture::textureUnit = 0;
-
-
-Texture::Texture(TextureType textureType,Shader *shader, const char *samplerName):
+Texture::Texture(TextureType textureType):
 	textureType(textureType)
 {
-	//设置采样器纹理单元的位置值
-	shader->SetUniform(samplerName, textureUnit);
+	//创建采样器对象
+	glCreateSamplers(1, &sampler);
+	//设置默认的纹理环绕和纹理过滤方式
+	this->SetTextureProperty(Wrap::Repeat);
+	this->SetTextureProperty(Filter::Linear);
 }
 
 Texture::~Texture()
@@ -37,8 +37,7 @@ void Texture::LoadTexture(const char * texturePath)
 	{
 		//创建二维纹理对象
 		glCreateTextures(GL_TEXTURE_2D, 1, &texture);
-		//将纹理对象绑定到纹理单元
-		glBindTextureUnit(textureUnit, texture);
+
 		//为纹理对象分配空间
 		if (nrChannel == 3)
 		{
@@ -53,12 +52,6 @@ void Texture::LoadTexture(const char * texturePath)
 		}
 	}
 
-	//创建采样器对象
-	glCreateSamplers(1, &sampler);
-	//将采样器对象绑定到纹理单元中
-	glBindSampler(textureUnit, sampler);
-	//这个纹理单元已经被使用，之后创建的纹理对象要使用之后纹理单元
-	textureUnit++;
 	//释放纹理数据
 	stbi_image_free(textureData);
 }
@@ -66,6 +59,8 @@ void Texture::LoadTexture(const char * texturePath)
 //设置滤波
 void Texture::SetTextureProperty(Filter filter)
 {
+	//记录当前滤波
+	this->filter = filter;
 	//设置线性过滤
 	if (filter == Filter::Linear)
 	{
@@ -82,6 +77,8 @@ void Texture::SetTextureProperty(Filter filter)
 //设置纹理环绕
 void Texture::SetTextureProperty(Wrap wrap)
 {
+	//记录当前纹理环绕方式
+	this->wrap = wrap;
 	//重复环绕
 	if (wrap == Wrap::Repeat)
 	{
@@ -107,4 +104,15 @@ void Texture::SetTextureProperty(Wrap wrap)
 		glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 		glSamplerParameteri(sampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	}
+}
+
+//将纹理绑定到纹理单元中
+void Texture::BindUnit(Shader * shader, const char * samplerName, GLuint textureUnit)
+{
+	//设置片元着色器中采样器的位置值
+	shader->SetUniform(samplerName, textureUnit);
+	//将纹理对象绑定到纹理单元
+	glBindTextureUnit(textureUnit, texture);
+	//将采样器对象绑定到纹理单元中
+	glBindSampler(textureUnit, sampler);
 }
