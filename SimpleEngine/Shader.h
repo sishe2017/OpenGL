@@ -7,11 +7,6 @@
 #include "../Library/glm/gtc/type_ptr.hpp"
 
 
-
-
-
-
-
 class Shader
 {
 public:
