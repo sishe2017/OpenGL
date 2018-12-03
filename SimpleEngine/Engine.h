@@ -31,6 +31,8 @@ private:
 	float background[4] = { 0.2f, 0.2f, 0.3f, 0 };
 	//初试深度
 	float initDepth = 1.0f;
+	//初试模板值
+	int initStencil = 0;
 	//主窗口
 	Window *mainWindow;
 };

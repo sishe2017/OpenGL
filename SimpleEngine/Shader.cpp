@@ -177,7 +177,7 @@ void Shader::ErrorHandling()
 {
 	if (location == -1)
 	{
-		//throw (out_of_range)"don't find uniform";
+		throw (out_of_range)"don't find uniform";
 	}
 }
 

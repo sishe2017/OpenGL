@@ -6,6 +6,7 @@
 class Transform;
 class Shader;
 class Material;
+class Texture;
 
 //游戏物体
 class GameObject
@@ -16,6 +17,8 @@ public:
 
 	//变换组件
 	Transform *transform;
+	//材质组件
+	Texture *texture;
 	//设置物体的颜色
 	void SetColor(glm::vec4 color, const char *colorName);
 	//设置物体的材质

@@ -81,6 +81,8 @@ void Engine::Run(std::function<void(void *)> update, void *param)
 		glClearBufferfv(GL_COLOR, 0, background);
 		//清除深度缓存
 		glClearBufferfv(GL_DEPTH, 0, &initDepth);
+		//清除模板缓存
+		glClearBufferiv(GL_STENCIL, 0, &initStencil);
 
 		//回调客户的业务
 		update(param);
