@@ -10,4 +10,8 @@ public:
 
 	//GLFW窗口
 	GLFWwindow *window;
+	//窗口的宽度
+	GLsizei width;
+	//窗口的高度
+	GLsizei height;
 };

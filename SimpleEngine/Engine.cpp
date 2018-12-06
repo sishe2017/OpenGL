@@ -30,7 +30,7 @@ Engine::~Engine()
 }
 
 //创建主窗口
-GLFWwindow * Engine::CreateMainWindow(const char * windowName, int width, int height)
+Window * Engine::CreateMainWindow(const char * windowName, int width, int height)
 {
 	//创建窗口
 	mainWindow = new Window(windowName, width, height);
@@ -44,7 +44,7 @@ GLFWwindow * Engine::CreateMainWindow(const char * windowName, int width, int he
 	//窗口改变的时候，视口随之改变
 	glfwSetFramebufferSizeCallback(mainWindow->window, FramebuffersSizeCallback);
 
-	return mainWindow->window;
+	return mainWindow;
 }
 
 //创建着色器程序

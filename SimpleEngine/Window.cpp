@@ -6,6 +6,9 @@ Window::Window(const char *windowName, int width, int height)
 	window = glfwCreateWindow(width, height, windowName, NULL, NULL);
 	//告诉GLFW窗口的上下文
 	glfwMakeContextCurrent(window);
+	//记录窗口的宽高
+	this->width = width;
+	this->height = height;
 }
 
 Window::~Window()
