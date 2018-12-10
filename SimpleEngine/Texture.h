@@ -42,8 +42,10 @@ public:
 	Texture(TextureType textureType);
 	~Texture();
 
-	//加载纹理
+	//加载2D纹理
 	void LoadTexture(const char *texturePath);
+	//按照右，左，上，下，前，后的顺序加载立方体纹理
+	void LoadTexture(std::string (&texturePath)[6]);
 	//设置滤波
 	void SetTextureProperty(Filter filter);
 	//设置纹理环绕
@@ -52,10 +54,14 @@ public:
 	void BindUnit(Shader *shader, const char *samplerName, GLuint textureUnit);
 	//边缘颜色
 	float borderColor[4] = { 0 };
+	//反转Y轴
+	void ReverseY();
 
 private:
 	//纹理类型
 	TextureType textureType;
+	//纹理所在的纹理单元
+	GLuint textureUnit;
 	//滤波
 	Filter filter;
 	//纹理环绕方式

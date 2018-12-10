@@ -1,6 +1,7 @@
 #include "Camera.h"
 #include <iostream>
 #include "Shader.h"
+#include "SkyBox.h"
 
 using namespace std;
 
@@ -50,9 +51,6 @@ void Camera::Move(Direction direction)
 		//摄像机朝向的目标也右移
 		target += speed * right;
 	}
-
-	//提交变换
-	CommitTransform();
 }
 
 //设置摄像机移动的速度
@@ -95,8 +93,6 @@ void Camera::PitchRotate(Direction direction)
 	//调整摄像机朝向的目标
 	target = position + distance * front;
 	distance = glm::distance(position, target);
-	//提交变换
-	CommitTransform();
 }
 
 //偏航角旋转
@@ -133,43 +129,35 @@ void Camera::HeadingRotate(Direction direction)
 	//调整摄像机朝向的目标
 	target = position + distance * front;
 	distance = glm::distance(position, target);
-	//提交变换
-	CommitTransform();
 }
 
 //关联着色器程序
 void Camera::AssociateShader(Shader *shader, const char * viewName)
 {
-	this->shader = shader;
-	this->viewName = viewName;
-	//提交变换
-	CommitTransform();
-	//初始化摄像机和目标之间的距离
-	distance = glm::distance(position, target);
+	//生成观察矩阵
+	view = glm::lookAt(position, target, up);
+	//设置观察矩阵
+	shader->SetUniform(viewName, view);
 }
 
 //关联着色器程序
 void Camera::AssociateShader(Shader * shader, const char * viewName, const char * viewPosName)
 {
-	this->shader = shader;
-	this->viewName = viewName;
-	this->viewPosName = viewPosName;
-	//提交变换
-	CommitTransform();
-	//初始化摄像机和目标之间的距离
-	distance = glm::distance(position, target);
+	//生成观察矩阵
+	view = glm::lookAt(position, target, up);
+	//设置观察矩阵
+	shader->SetUniform(viewName, view);
+	//设置观察位置
+	shader->SetUniform(viewPosName, position);
 }
 
-//提交变换结果
-void Camera::CommitTransform()
+//影响天空盒子
+void Camera::InflunceSkyBox(SkyBox * skyBox, const char *viewName)
 {
-	//重新生成观察矩阵
+	//生成观察矩阵
 	view = glm::lookAt(position, target, up);
-	//设置观察矩阵变量
-	shader->SetUniform(viewName.c_str(), view);
-	//如果片元处理在世界空间，则设置观察坐标
-	if (viewPosName != "")
-	{
-		shader->SetUniform(viewPosName.c_str(), position);
-	}
+	//去掉观察矩阵位移的部分
+	glm::mat4 noTrans = glm::mat4(glm::mat3(view));
+	//设置观察矩阵
+	skyBox->shader->SetUniform(viewName, noTrans);
 }

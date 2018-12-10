@@ -6,8 +6,8 @@
 #include "../Library/glm/gtc/type_ptr.hpp"
 #include <string>
 
-//着色器
 class Shader;
+class SkyBox;
 
 //摄像机移动方向
 enum class Direction
@@ -44,10 +44,11 @@ public:
 	void AssociateShader(Shader *shader, const char *viewName);
 	//关联着色器程序
 	void AssociateShader(Shader *shader, const char *viewName, const char *viewPosName);
+	//影响天空盒子
+	void InflunceSkyBox(SkyBox *skyBox, const char *viewName);
+private:
 	//观察矩阵
 	glm::mat4 view;
-	
-private:
 	//摄像机位置
 	glm::vec3 position;
 	//摄像机的前向量
@@ -68,14 +69,5 @@ private:
 	float speed = 0.1f;
 	//摄像机旋转速度
 	float rotateSpeed = 1.0f;
-
-	//与摄像机相关联的着色器
-	Shader *shader;
-	//观察矩阵的名字
-	std::string viewName;
-	//摄像机位置的名字
-	std::string viewPosName;
-	//提交变换结果
-	void CommitTransform();
 };
 
