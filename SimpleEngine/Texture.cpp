@@ -48,8 +48,6 @@ void Texture::LoadTexture(const char * texturePath)
 	int height;
 	//颜色通道数量
 	int nrChannel;
-	//翻转y轴
-	stbi_set_flip_vertically_on_load(true);
 	//获取纹理信息相关数据
 	textureData = stbi_load(texturePath, &width, &height, &nrChannel, 0);
 
@@ -171,7 +169,9 @@ void Texture::BindUnit(Shader * shader, const char * samplerName, GLuint texture
 }
 
 //反转Y轴
-void Texture::ReverseY()
+void Texture::ReverseY(bool flag)
 {
-	stbi_set_flip_vertically_on_load(true);
+	stbi_set_flip_vertically_on_load(flag);
 }
+
+

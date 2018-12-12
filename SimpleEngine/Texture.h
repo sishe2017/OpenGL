@@ -55,7 +55,7 @@ public:
 	//边缘颜色
 	float borderColor[4] = { 0 };
 	//反转Y轴
-	void ReverseY();
+	static void ReverseY(bool flag);
 
 private:
 	//纹理类型
