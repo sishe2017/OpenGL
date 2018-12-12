@@ -61,6 +61,22 @@ Shader *Engine::CreateShader(const char * vertexPath, const char * fragPath)
 	return shader;
 }
 
+//创建着色器程序
+Shader * Engine::CreateShader(const char * vertexPath, const char * geoPath, const char * fragPath)
+{
+	Shader *shader = new Shader;
+	//编译顶点着色器
+	shader->CompileVertex(vertexPath);
+	//编译几何着色器
+	shader->CompileGeo(geoPath);
+	//编译片元着色器
+	shader->CompileFrag(fragPath);
+	//链接着色器程序
+	shader->LinkProgram();
+
+	return shader;
+}
+
 //初始化投影矩阵
 void Engine::InitProjection(Shader *shader, const char *projectionName)
 {

@@ -15,6 +15,8 @@ public:
 
 	//编译顶点着色器代码
 	void CompileVertex(const char *path);
+	//编译几何着色器代码
+	void CompileGeo(const char *path);
 	//编译片元着色器代码
 	void CompileFrag(const char *path);
 	//链接程序
@@ -34,6 +36,8 @@ public:
 private:
 	//顶点着色器
 	GLuint vertexShader;
+	//几何着色器
+	GLuint geoShader;
 	//片元着色器
 	GLuint fragShader;
 	//uniform变量位置

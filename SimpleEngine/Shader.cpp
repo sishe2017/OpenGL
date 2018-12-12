@@ -6,7 +6,10 @@
 
 using namespace std;
 
-Shader::Shader()
+Shader::Shader():
+	vertexShader(0),
+	geoShader(0),
+	fragShader(0)
 {
 
 }
@@ -54,6 +57,48 @@ void Shader::CompileVertex(const char *path)
 	{
 		cout << "compile vertex shader error" << endl;
 		glGetShaderInfoLog(vertexShader, 512, NULL, log);
+		exit(EXIT_FAILURE);
+	}
+}
+
+//编译几何着色器代码
+void Shader::CompileGeo(const char * path)
+{
+	//顶点着色器文件
+	ifstream vertexFile;
+	//顶点文件流
+	stringstream vertexss;
+
+	//打开文件
+	vertexFile.open(path);
+	//打开文件失败，作出相应处理
+	if (!vertexFile.is_open())
+	{
+		cout << "open vertex file error" << endl;
+		exit(EXIT_FAILURE);
+	}
+
+	//将文件内容输入到数据流中
+	vertexss << vertexFile.rdbuf();
+	//再将数据流的内容输入到字符串中
+	string vertexCode = vertexss.str();
+	const char *vShaderCode = vertexCode.c_str();
+
+	//创建几何着色器对象
+	geoShader = glCreateShader(GL_GEOMETRY_SHADER);
+	//将着色器对象和着色器代码相关联
+	glShaderSource(geoShader, 1, &vShaderCode, NULL);
+	//编译顶点着色器代码
+	glCompileShader(geoShader);
+	//获取编译结果
+	GLint success;
+	glGetShaderiv(geoShader, GL_COMPILE_STATUS, &success);
+	//编译失败，输出日志
+	char log[512];
+	if (!success)
+	{
+		cout << "compile vertex shader error" << endl;
+		glGetShaderInfoLog(geoShader, 512, NULL, log);
 		exit(EXIT_FAILURE);
 	}
 }
@@ -107,7 +152,13 @@ void Shader::LinkProgram()
 	program = glCreateProgram();
 	//将顶点着色器和片元着色器添加到程序中
 	glAttachShader(program, vertexShader);
+	//如果启用了几何着色器则也需要将几何着色器添加到程序中
+	if (geoShader != 0)
+	{
+		glAttachShader(program, geoShader);
+	}
 	glAttachShader(program, fragShader);
+	
 	//链接程序
 	glLinkProgram(program);
 	//获取链接结果
@@ -123,6 +174,11 @@ void Shader::LinkProgram()
 	}
 	//删除着色器
 	glDeleteShader(vertexShader);
+	//如果启用了几何着色器，那么要删除几何着色器
+	if (geoShader != 0)
+	{
+		glDeleteShader(geoShader);
+	}
 	glDeleteShader(fragShader);
 }
 

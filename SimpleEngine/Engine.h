@@ -19,6 +19,8 @@ public:
 	Window *CreateMainWindow(const char *windowName, int width, int height);
 	//创建着色器程序
 	Shader *CreateShader(const char *vertexPath, const char *fragPath);
+	//创建着色器程序
+	Shader *CreateShader(const char *vertexPath, const char *geoPath, const char *fragPath);
 	//初始化投影矩阵
 	void InitProjection(Shader *shader, const char *projectionName);
 	//启动引擎
