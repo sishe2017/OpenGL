@@ -6,8 +6,7 @@
 
 using namespace std;
 
-Model::Model(Transform *transform):
-	transform(transform)
+Model::Model()
 {
 
 }
@@ -42,7 +41,7 @@ void Model::Draw()
 {
 	for (auto c : meshs)
 	{
-		c->Draw(transform->GetShader());
+		c->Draw(shader);
 	}
 }
 

@@ -13,17 +13,20 @@
 class Mesh;
 class Texture;
 class Transform;
+class Shader;
 
 //模型
 class Model
 {
 public:
-	Model(Transform *transform);
+	Model();
 	~Model();
 	//漫反射纹理采样器名字集合（下标是关联的纹理单元）
 	std::vector<std::string> diffuseNameUnits;
 	//镜面高光纹理采样器名字集合（下标是关联的纹理单元）
 	std::vector<std::string> specularNameUnits;
+	//绘制模型的着色器
+	Shader *shader;
 	//模型的transform组件
 	Transform *transform;
 	//加载模型数据
