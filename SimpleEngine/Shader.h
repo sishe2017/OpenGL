@@ -10,6 +10,10 @@
 class Shader
 {
 public:
+	//生成的Shader的自动版本
+	Shader(const char *vertPath, const char *fragPath);
+	//生成的Shader的自动版本
+	Shader(const char *vertPath, const char *geoPath, const char *fragPath);
 	Shader();
 	~Shader();
 

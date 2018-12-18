@@ -6,6 +6,30 @@
 
 using namespace std;
 
+//生成的Shader的自动版本
+Shader::Shader(const char * vertPath, const char * fragPath)
+{
+	//编译顶点着色器
+	CompileVertex(vertPath);
+	//编译片元着色器
+	CompileFrag(fragPath);
+	//链接程序
+	LinkProgram();
+}
+
+//生成的Shader的自动版本
+Shader::Shader(const char * vertPath, const char * geoPath, const char * fragPath)
+{
+	//编译顶点着色器
+	CompileVertex(vertPath);
+	//生成几何着色器
+	CompileGeo(geoPath);
+	//编译片元着色器
+	CompileFrag(fragPath);
+	//链接程序
+	LinkProgram();
+}
+
 Shader::Shader():
 	vertexShader(0),
 	geoShader(0),
