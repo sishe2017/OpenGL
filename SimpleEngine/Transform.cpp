@@ -19,7 +19,7 @@ void Transform::Position(glm::vec3 position)
 	//记录物体位置
 	this->position = position;
 	//平移物体到对应坐标
-	this->model = glm::translate(model, position);
+	this->model = glm::translate(glm::mat4(1.0f), position);
 	//提交变换
 	CommitTransform();
 }

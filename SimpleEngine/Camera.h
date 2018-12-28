@@ -46,11 +46,12 @@ public:
 	void AssociateShader(Shader *shader, const char *viewName, const char *viewPosName);
 	//影响天空盒子
 	void InflunceSkyBox(SkyBox *skyBox, const char *viewName);
-private:
 	//观察矩阵
 	glm::mat4 view;
 	//摄像机位置
 	glm::vec3 position;
+private:
+
 	//摄像机的前向量
 	glm::vec3 front = glm::vec3(0, 0, -1.0f);
 	//摄像机的上向量

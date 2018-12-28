@@ -9,6 +9,7 @@ using namespace std;
 Camera::Camera(glm::vec3 cameraPosition)
 	:position(cameraPosition)
 {
+	distance = glm::distance(position, target);
 }
 
 

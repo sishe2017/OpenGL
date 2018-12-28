@@ -25,16 +25,16 @@ public:
 	void Scale(glm::vec3 scale);
 	//获取transform组件对应的shader
 	Shader *GetShader();
+	
 private:
 	//物体坐标
 	glm::vec3 position;
-	//物体的模型矩阵
-	glm::mat4 model = glm::mat4(1.0f);
 	//和组件关联的着色器
 	Shader *shader;
 	//模型矩阵的名字
 	std::string modelName;
-
+	//物体的模型矩阵
+	glm::mat4 model = glm::mat4(1.0f);
 	//将变换后的模型矩阵提交给顶点着色器
 	void CommitTransform();
 };

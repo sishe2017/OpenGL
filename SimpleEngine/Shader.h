@@ -28,15 +28,15 @@ public:
 	//运行程序
 	void RunProgram();
 	//设置着色器程序中的整型的uniform变量
-	void SetUniform(const char *uniformName, GLuint &value);
+	void SetUniform(const char *uniformName, GLuint value);
 	//设置着色器程序中的float类型的uniform变量
-	void SetUniform(const char *uniformName, float &value);
+	void SetUniform(const char *uniformName, float value);
 	//设置着色器程序中的vec3类型的uniform变量
-	void SetUniform(const char *uniformName, glm::vec3 &value);
+	void SetUniform(const char *uniformName, glm::vec3 value);
 	//设置着色器程序中的vec4类型的uniform变量
-	void SetUniform(const char *uniformName, glm::vec4 &value);
+	void SetUniform(const char *uniformName, glm::vec4 value);
 	//设置着色器程序中的mat4类型的uniform变量
-	void SetUniform(const char *uniformName, glm::mat4 &value);
+	void SetUniform(const char *uniformName, glm::mat4 value);
 private:
 	//顶点着色器
 	GLuint vertexShader;

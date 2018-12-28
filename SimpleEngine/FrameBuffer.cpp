@@ -67,9 +67,9 @@ void FrameBuffer::AssociateWindow(Window * window)
 	//将渲染缓存附加到帧缓存上
 	glNamedFramebufferRenderbuffer(FBO, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, RBO);
 	//检查帧缓存的完整性
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	if (glCheckNamedFramebufferStatus(FBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 	{
-		cout << "frame buffer is not complete" << endl;
+		std::cout << "frame buffer is not complete" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 }
@@ -106,9 +106,9 @@ void FrameBuffer::AssociateWindow(Window * window, int samplers)
 	//将渲染缓存附加到帧缓存上
 	glNamedFramebufferRenderbuffer(FBO, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, RBO);
 	//检查帧缓存的完整性
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	if (glCheckNamedFramebufferStatus(FBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 	{
-		cout << "frame buffer is not complete" << endl;
+		std::cout << "frame buffer is not complete" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -120,6 +120,12 @@ void FrameBuffer::AssociateWindow(Window * window, int samplers)
 	glTextureStorage2D(dstTexture, 1, GL_RGB8, width, height);
 	//将纹理对象关联到帧缓存的颜色缓存部分
 	glNamedFramebufferTexture(dstFBO, GL_COLOR_ATTACHMENT0, texture, 0);
+	//检查帧缓存的完整性
+	if (glCheckNamedFramebufferStatus(dstFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	{
+		std::cout << "frame buffer is not complete" << std::endl;
+		exit(EXIT_FAILURE);
+	}
 }
 
 //让帧缓存做好接受渲染数据的准备
