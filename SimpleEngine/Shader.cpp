@@ -212,6 +212,14 @@ void Shader::RunProgram()
 	glUseProgram(program);
 }
 
+//设置着色器程序中的布尔型uniform变量
+void Shader::SetUniform(const char * uniformName, bool value)
+{
+	location = glGetUniformLocation(program, uniformName);
+	ErrorHandling();
+	glUniform1i(location, value);
+}
+
 //设置着色器程序中的整型的uniform变量
 void Shader::SetUniform(const char * uniformName, GLuint value)
 {
