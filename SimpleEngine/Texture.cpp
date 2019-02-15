@@ -51,11 +51,15 @@ void Texture::LoadTexture(const char * texturePath)
 	//获取纹理信息相关数据
 	textureData = stbi_load(texturePath, &width, &height, &nrChannel, 0);
 
-	//根据纹理通道数量为纹理对象分配空间
-	if (nrChannel == 3)
+	//根据纹理通道数量为纹理对象分配空间并更新数据
+	if (nrChannel == 1)
+	{
+		glTextureStorage2D(texture, 1, GL_R8, width, height);
+		glTextureSubImage2D(texture, 0, 0, 0, width, height, GL_RED, GL_UNSIGNED_BYTE, textureData);
+	}
+	else if (nrChannel == 3)
 	{
 		glTextureStorage2D(texture, 1, GL_RGB8, width, height);
-		//更新纹理对象数据
 		glTextureSubImage2D(texture, 0, 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, textureData);
 	}
 	else if (nrChannel == 4)
@@ -63,8 +67,6 @@ void Texture::LoadTexture(const char * texturePath)
 		glTextureStorage2D(texture, 1, GL_RGBA8, width, height);
 		glTextureSubImage2D(texture, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
 	}
-	//翻转y轴
-	stbi_set_flip_vertically_on_load(false);
 	//释放纹理数据
 	stbi_image_free(textureData);
 }
